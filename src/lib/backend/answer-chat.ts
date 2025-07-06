@@ -5,8 +5,15 @@ import { supabaseVectoreRetriever } from "./vector-retriever";
 import { combineDocs } from "@/utils/backend";
 import answerPrompt from "./prompts/answer-prompt";
 import { RunnableSequence } from "@langchain/core/runnables";
+import { ChatMessage } from "@/types";
+
+const history: ChatMessage[] = [];
 
 export default async function answerChat(message: string) {
+  history.push({
+    role: "user",
+    content: message,
+  });
   const llm = new ChatGoogleGenerativeAI({
     apiKey: process.env.NEXT_GOOGLE_GEN_AI_API,
     model: "gemini-2.0-flash",
@@ -19,7 +26,8 @@ export default async function answerChat(message: string) {
     .pipe(combineDocs);
 
   const answerChain = RunnableSequence.from([
-    ({ context }) => ({ context, message }),
+    ({ context }) => ({ context, chats_messages: history }),
+    // (prev) => console.log(prev),
     answerPrompt,
     llm,
     new StringOutputParser(),
@@ -32,7 +40,12 @@ export default async function answerChat(message: string) {
     answerChain,
   ]);
 
-  const result = await chain.invoke({ message });
+  const result = await chain.invoke({ chats_messages: history });
+
+  history.push({
+    role: "model",
+    content: result,
+  });
 
   return result;
 }

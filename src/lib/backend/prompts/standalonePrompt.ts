@@ -10,9 +10,10 @@ Your task:
 - Remove polite filler (e.g. "please", "if you don't mind")
 - Rephrase the question so it is standalone and clear
 - Keep only the essential meaning needed for search and answering
+- You will get all history and you will modify only the last message.
 
 Input:
-user message: {message}
+chats: {chats_messages}
 
 Output:
 standalone_question:
