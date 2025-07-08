@@ -1,18 +1,25 @@
-import { Document } from "langchain/document";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { SupabaseVectorStore } from "@langchain/community/vectorstores/supabase";
 import { supabaseClient } from "./supabase-client";
-import { ERROR_TAGS } from "@/utils/shared/error-tags";
+import {
+  EMBEDDING_MODEL,
+  ERROR_TAGS,
+  SUPABASE_TABLES,
+} from "@/utils/shared/CONST";
+import z from "zod";
+import { ChunkDocumentSchema } from "@/types/schemas";
 
-export default async function embedAndInsert(docs: Document[]) {
+export default async function embedAndInsert(
+  docs: z.infer<typeof ChunkDocumentSchema>[]
+) {
   try {
     const embeddings = new GoogleGenerativeAIEmbeddings({
       apiKey: process.env.NEXT_GOOGLE_GEN_AI_API,
-      model: "text-embedding-004",
+      model: EMBEDDING_MODEL,
     });
 
     await SupabaseVectorStore.fromDocuments(docs, embeddings, {
-      tableName: "ai_persona",
+      tableName: SUPABASE_TABLES.AI_PERSONA,
       client: supabaseClient,
     });
   } catch (error) {

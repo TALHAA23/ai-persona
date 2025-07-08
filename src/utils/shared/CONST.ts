@@ -11,3 +11,8 @@ export const ERROR_TAGS = {
 } as const;
 
 export type ErrorTag = keyof typeof ERROR_TAGS;
+export const EMBEDDING_MODEL = "text-embedding-004";
+
+export const SUPABASE_TABLES = {
+  AI_PERSONA: "ai_persona",
+};

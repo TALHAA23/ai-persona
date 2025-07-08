@@ -5,9 +5,10 @@ import { supabaseVectoreRetriever } from "./vector-retriever";
 import { combineDocs } from "@/utils/backend";
 import answerPrompt from "./prompts/answer-prompt";
 import { RunnableSequence } from "@langchain/core/runnables";
-import { ChatMessage } from "@/types";
+import z from "zod";
+import { ChatMessageSchema } from "@/types/schemas";
 
-const history: ChatMessage[] = [];
+const history: z.infer<typeof ChatMessageSchema>[] = [];
 
 export default async function answerChat(message: string) {
   history.push({
