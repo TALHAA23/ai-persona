@@ -2,8 +2,8 @@ import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { SupabaseVectorStore } from "@langchain/community/vectorstores/supabase";
 import { supabaseClient } from "./supabase-client";
 import {
-  EMBEDDING_MODEL,
   ERROR_TAGS,
+  GEMINI_MODELS,
   SUPABASE_TABLES,
 } from "@/utils/shared/CONST";
 import z from "zod";
@@ -15,11 +15,11 @@ export default async function embedAndInsert(
   try {
     const embeddings = new GoogleGenerativeAIEmbeddings({
       apiKey: process.env.NEXT_GOOGLE_GEN_AI_API,
-      model: EMBEDDING_MODEL,
+      model: GEMINI_MODELS.EMBEDDING_MODEL,
     });
 
     await SupabaseVectorStore.fromDocuments(docs, embeddings, {
-      tableName: SUPABASE_TABLES.AI_PERSONA,
+      tableName: SUPABASE_TABLES.EMBEDDINGS,
       client: supabaseClient,
     });
   } catch (error) {

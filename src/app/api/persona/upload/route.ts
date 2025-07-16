@@ -1,33 +1,18 @@
-import fs from "node:fs/promises";
-import { NextResponse } from "next/server";
-import path from "node:path";
-import createChunks from "@/lib/backend/create-chunks";
+import { NextRequest, NextResponse } from "next/server";
 import embedAndInsert from "@/lib/backend/embedd-and-insert";
 import z from "zod";
-import {
-  ChunkDocumentSchema,
-  PersonaCreationInputSchema,
-} from "@/types/schemas";
-import formSectionDataToString from "@/utils/backend/form-section-data-to-string";
+import { PersonaCreationInputSchema } from "@/types/schemas";
+import createFormDataChunks from "@/lib/backend/create-form-data-chunks";
 
-const dummeyMetaData: z.infer<typeof ChunkDocumentSchema>["metadata"] = {
-  category: "hobbies",
-  file_id: "001",
-  persona_id: "002",
-  section_id: "3232",
-};
-
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const data = await req.json();
+    // const data = await req.formData();
+    const formData = await req.formData();
+    console.log(formData);
+    return NextResponse.json("ok");
     const parsed = PersonaCreationInputSchema.parse(data);
-    const details = formSectionDataToString(parsed.form_sections);
-    return NextResponse.json(details.join("\n"));
-    const filePath = path.join(process.cwd(), "public", "bio.md");
-    const userFile = await fs.readFile(filePath, { encoding: "utf-8" });
-    const docs = await createChunks(userFile, dummeyMetaData);
-
-    await embedAndInsert(docs);
+    const response = await createFormDataChunks(parsed);
+    await embedAndInsert(response);
     return NextResponse.json({
       success: true,
       message: "Successfully Inserted!",
