@@ -42,13 +42,8 @@ export const FormSectionSchema = z.object({
 });
 
 export const FileUploadSchema = z.object({
-  file_id: z.string(),
-  original_filename: z.string(),
-  file_size: z.number(),
-  mime_type: z.string(),
-  file_url: z.string(),
-
-  user_metadata: z.object({
+  file: z.instanceof(File),
+  metadata: z.object({
     title: z.string(),
     description: z.string(),
     content_type: ContentTypeEnum,
@@ -59,18 +54,39 @@ export const FileUploadSchema = z.object({
     tags: z.array(z.string()),
     context_notes: z.string().optional(),
   }),
-
-  processing_status: z.enum(["pending", "processing", "completed", "failed"]),
-  extracted_content: z.string().optional(),
-  processing_metadata: z
-    .object({
-      chunk_count: z.number().optional(),
-      entities_extracted: z.array(z.string()).optional(),
-      auto_generated_tags: z.array(z.string()).optional(),
-      sentiment_score: z.number().optional(),
-    })
-    .optional(),
 });
+
+export const FileUploadArraySchema = z.array(FileUploadSchema);
+// export const FileUploadSchema = z.object({
+//   file_id: z.string(),
+//   original_filename: z.string(),
+//   file_size: z.number(),
+//   mime_type: z.string(),
+//   file_url: z.string(),
+
+//   user_metadata: z.object({
+//     title: z.string(),
+//     description: z.string(),
+//     content_type: ContentTypeEnum,
+//     topics: z.array(z.string()),
+//     keywords: z.array(z.string()),
+//     time_period: z.string().optional(),
+//     importance: ImportanceEnum,
+//     tags: z.array(z.string()),
+//     context_notes: z.string().optional(),
+//   }),
+
+//   processing_status: z.enum(["pending", "processing", "completed", "failed"]),
+//   extracted_content: z.string().optional(),
+//   processing_metadata: z
+//     .object({
+//       chunk_count: z.number().optional(),
+//       entities_extracted: z.array(z.string()).optional(),
+//       auto_generated_tags: z.array(z.string()).optional(),
+//       sentiment_score: z.number().optional(),
+//     })
+//     .optional(),
+// });
 
 export const PersonaCreationInputSchema = z.object({
   user_id: z.string(),
@@ -78,7 +94,7 @@ export const PersonaCreationInputSchema = z.object({
   persona_description: z.string().optional(),
 
   form_sections: z.array(FormSectionSchema),
-  file_uploads: z.array(FileUploadSchema),
+  file_uploads: FileUploadArraySchema,
 
   global_settings: z.object({
     default_tone: PersonaToneEnum.optional().default("friendly"),

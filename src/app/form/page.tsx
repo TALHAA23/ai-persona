@@ -2,11 +2,10 @@
 import { useRef, useState } from "react";
 
 export default function Form() {
-  const ref = useRef(null);
   const [form, setForm] = useState({
-    user_id: "",
-    persona_name: "",
-    persona_description: "",
+    user_id: "000001",
+    persona_name: "alex-morgen",
+    persona_description: "this is a test persona",
     form_sections: [],
     file_uploads: [],
     global_settings: {
@@ -43,6 +42,11 @@ export default function Form() {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
+    // ["topics", "keywords", "tags"].map((item) => {
+    //   const field = formData.get(item);
+    //   console.log(field);
+    // });
+    // return;
 
     // Collect all file inputs by index
     const files: File[] = [];
@@ -57,11 +61,11 @@ export default function Form() {
         title: formData.get(`file_title_${i}`),
         description: formData.get(`file_description_${i}`),
         content_type: formData.get(`file_content_type_${i}`),
-        topics: formData.get(`file_topics_${i}`),
-        keywords: formData.get(`file_keywords_${i}`),
+        topics: [formData.get(`file_topics_${i}`)],
+        keywords: [formData.get(`file_keywords_${i}`)],
         time_period: formData.get(`file_time_period_${i}`),
         importance: formData.get(`file_importance_${i}`),
-        tags: formData.get(`file_tags_${i}`),
+        tags: [formData.get(`file_tags_${i}`)],
         context_notes: formData.get(`file_context_notes_${i}`),
       };
 
@@ -89,6 +93,7 @@ export default function Form() {
     files.forEach((file) => {
       formData.append("file_uploads", file);
     });
+
     formData.append("file_uploads_metadata", JSON.stringify(fileMetadatas));
     console.log([...formData.entries()]);
     await fetch("/api/persona/upload", {

@@ -1,16 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import embedAndInsert from "@/lib/backend/embedd-and-insert";
 import z from "zod";
-import { PersonaCreationInputSchema } from "@/types/schemas";
 import createFormDataChunks from "@/lib/backend/create-form-data-chunks";
+import { resolvePersonaCreationData } from "@/utils/backend";
+import {
+  FileUploadArraySchema,
+  PersonaCreationInputSchema,
+} from "@/types/schemas";
+import uploadFiles from "@/lib/backend/uploadFiles";
+import readFiles from "@/lib/backend/readFiles";
 
 export async function POST(req: NextRequest) {
   try {
-    // const data = await req.formData();
     const formData = await req.formData();
-    console.log(formData);
+    const resolvedData = resolvePersonaCreationData(formData);
+    const parsedFiles = FileUploadArraySchema.parse(resolvedData.file_uploads);
+    const uploadedFiles = await uploadFiles("0001", "alex-morgen", parsedFiles);
+    await readFiles("0001", "alex-morgen", uploadedFiles);
+
+    // const parsed = PersonaCreationInputSchema.parse(resolvedData);
     return NextResponse.json("ok");
-    const parsed = PersonaCreationInputSchema.parse(data);
+    const parsed = PersonaCreationInputSchema.parse("data");
     const response = await createFormDataChunks(parsed);
     await embedAndInsert(response);
     return NextResponse.json({
@@ -18,6 +28,7 @@ export async function POST(req: NextRequest) {
       message: "Successfully Inserted!",
     });
   } catch (error) {
+    console.log(error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
