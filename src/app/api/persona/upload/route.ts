@@ -9,6 +9,7 @@ import {
 } from "@/types/schemas";
 import uploadFiles from "@/lib/backend/uploadFiles";
 import readFiles from "@/lib/backend/readFiles";
+import createChunks from "@/lib/backend/create-chunks-from-files-content";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,9 +17,9 @@ export async function POST(req: NextRequest) {
     const resolvedData = resolvePersonaCreationData(formData);
     const parsedFiles = FileUploadArraySchema.parse(resolvedData.file_uploads);
     const uploadedFiles = await uploadFiles("0001", "alex-morgen", parsedFiles);
-    await readFiles("0001", "alex-morgen", uploadedFiles);
-
-    // const parsed = PersonaCreationInputSchema.parse(resolvedData);
+    const content = await readFiles("0001", "alex-morgen", uploadedFiles);
+    const docs = await createChunks(content);
+    console.log(docs);
     return NextResponse.json("ok");
     const parsed = PersonaCreationInputSchema.parse("data");
     const response = await createFormDataChunks(parsed);

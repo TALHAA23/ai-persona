@@ -17,10 +17,12 @@ export default async function uploadFiles(
       });
     });
 
+    // TODO: Hanlde success = rejected
     const results = await Promise.allSettled(uploads);
     return results.map((result, index) => ({
       filename: files[index].file.name,
       success: result.status == "fulfilled",
+      metadata: files[index].metadata,
     }));
   } catch (error) {
     console.log(ERROR_TAGS.SUPABASE_STORAGE_ERROR, error);
