@@ -30,19 +30,35 @@ Return only a JSON array like this (note the structure):
   {{
     "pageContent": "Alex Morgan is a non-binary marketing strategist with 10 years of experience at BrightWave Media...",
     "metadata": {{
-      "section_id": "work_info",
-      "tags": ["career", "skills", "education"],
-      "topics": ["marketing", "career", "education"],
-      "content_type": "form_section",
-      "is_current": true,
-      "confidence_level": 0.95,
-      "persona_name": "Alex Morgan",
-      "language": "en",
-      "tone": "friendly"
+      // This metadata follows a fixed schema provided externally — do not change its structure.
+      // Retain all existing fields from the original metadata object.
+
+      // Improve the following fields based on pageContent:
+      // - topics: Enrich with related or higher-level thematic concepts.
+      // - keywords: Add precise, semantically relevant terms (e.g., named entities, roles, tools, sectors).
+      // - tags: Supplement with normalized or synonymous tags if relevant.
+
+      // Do not remove or rename any metadata fields.
+
+      // The incoming metadata may or may not contain optional fields:
+        // - context_notes (string)
+        // - relevance_scope (array of strings) — when to surface this info
+        // - audience_tags (array of strings) — who should see this
+        // If these fields are missing, you may create them and populate with relevant values;
+        // if present, you may enhance them on the user's behalf.
+
+      // infer them if possible using the content — e.g., derive context_notes from implied use cases,
+      // suggest relevance_scope based on when/why the content would be surfaced,
+      // and infer audience_tags based on who would benefit from this information.
+
+      // Do not modify system-generated fields like source_type, source_id, processing_info, or temporal_context
+      // unless it's to normalize or complete them using clearly inferable information from the content.
+
+      // All updates must preserve compatibility with the UnifiedMetadataSchema, even though the AI cannot see it.
     }}
-  }},
-  ...
+  }}
 ]
+
 
 STYLE:
 - Use a tone matching the "default_tone" in global_settings.

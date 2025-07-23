@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const RoleEnum = z.enum(["user", "model"]);
-export const CategoriesEnum = z.enum(["work", "hobbies", "personal"]);
+export const CategoriesEnum = z.enum(["work", "hobbies", "personal", "other"]);
 export const ImportanceEnum = z.enum(["low", "medium", "high"]);
 export const PrivacyLevelEnum = z.enum(["public", "private", "selective"]);
 export const RecommendedLengthEnum = z.enum(["short", "medium", "long"]);

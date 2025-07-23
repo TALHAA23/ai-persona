@@ -7,7 +7,6 @@ import {
   PersonaTypeEnum,
   PrivacyLevelEnum,
   QueryIntentEnum,
-  RecommendedLengthEnum,
   RoleEnum,
 } from "./enums";
 
@@ -16,77 +15,93 @@ export const ChatMessageSchema = z.object({
   content: z.string(),
 });
 
-export const ChunkMetadataSchema = z.object({
+// Single source of truth for all metadata
+export const UnifiedMetadataSchema = z.object({
+  // Core identification
+  user_id: z.string(),
   persona_id: z.string(),
-  section_id: z.string(),
-  file_id: z.string(),
+  source_type: z.enum(["form", "file"]),
+  source_id: z.string(), // form section ID or file ID
   category: CategoriesEnum,
+
+  // Content classification
+  content_type: ContentTypeEnum,
+  topics: z.array(z.string()),
+  keywords: z.array(z.string()),
+  tags: z.array(z.string()),
+
+  // Temporal context
+  temporal_context: z.object({
+    time_period: z.string().optional(),
+    is_current: z.boolean().default(true),
+    is_historical: z.boolean().default(false),
+    valid_from: z.date().optional(),
+    valid_until: z.date().optional(),
+  }),
+
+  // Importance and usage
+  importance: ImportanceEnum,
+  confidence_level: z.number().min(0).max(1).default(1),
+  // privacy_level: z.enum(["public", "private", "selective"]).default("private"),
+
+  // Context and description
+  title: z.string(),
+  description: z.string(),
+  context_notes: z.string().optional(),
+
+  // Query optimization
+  relevance_scope: z.array(z.string()).optional(), // When to surface this info
+  audience_tags: z.array(z.string()).optional(), // Who should see this
+
+  // Processing metadata
+  processing_info: z
+    .object({
+      created_at: z.date(),
+      updated_at: z.date(),
+      chunk_index: z.number().optional(), // For file chunks
+      total_chunks: z.number().optional(), // Total chunks from this source
+    })
+    .optional(),
 });
+
+export type UnifiedMetadata = z.infer<typeof UnifiedMetadataSchema>;
 
 export const ChunkDocumentSchema = z.object({
   pageContent: z.string(),
-  metadata: ChunkMetadataSchema,
+  metadata: UnifiedMetadataSchema,
+});
+export const ChunkDocumentsSchema = z.array(ChunkDocumentSchema);
+
+//! Chunk Schema (what gets stored in your vector DB)
+export const ChunkSchema = z.object({
+  chunk_id: z.string(),
+  persona_id: z.string(),
+  content: z.string(), // The actual text content
+  embedding: z.array(z.number()).optional(), // Vector embedding
+  metadata: UnifiedMetadataSchema, // Same metadata for all chunks
 });
 
+// Form Section Schema
 export const FormSectionSchema = z.object({
   section_id: z.string(),
   section_name: z.string(),
   is_completed: z.boolean(),
   data: z.record(z.any()),
-  metadata: z.object({
-    confidence_level: z.number().optional(),
-    is_current: z.boolean().optional(),
-    last_updated: z.date().optional(),
-    tags: z.array(z.string()).optional(),
+  metadata: UnifiedMetadataSchema.omit({
+    source_type: true, // We'll add this programmatically
+    source_id: true,
+    persona_id: true,
+    user_id: true,
   }),
 });
 
+// File Upload Schema
 export const FileUploadSchema = z.object({
   file: z.instanceof(File),
-  metadata: z.object({
-    title: z.string(),
-    description: z.string(),
-    content_type: ContentTypeEnum,
-    topics: z.array(z.string()),
-    keywords: z.array(z.string()),
-    time_period: z.string().optional(),
-    importance: ImportanceEnum,
-    tags: z.array(z.string()),
-    context_notes: z.string().optional(),
-  }),
+  metadata: UnifiedMetadataSchema,
 });
 
 export const FileUploadArraySchema = z.array(FileUploadSchema);
-// export const FileUploadSchema = z.object({
-//   file_id: z.string(),
-//   original_filename: z.string(),
-//   file_size: z.number(),
-//   mime_type: z.string(),
-//   file_url: z.string(),
-
-//   user_metadata: z.object({
-//     title: z.string(),
-//     description: z.string(),
-//     content_type: ContentTypeEnum,
-//     topics: z.array(z.string()),
-//     keywords: z.array(z.string()),
-//     time_period: z.string().optional(),
-//     importance: ImportanceEnum,
-//     tags: z.array(z.string()),
-//     context_notes: z.string().optional(),
-//   }),
-
-//   processing_status: z.enum(["pending", "processing", "completed", "failed"]),
-//   extracted_content: z.string().optional(),
-//   processing_metadata: z
-//     .object({
-//       chunk_count: z.number().optional(),
-//       entities_extracted: z.array(z.string()).optional(),
-//       auto_generated_tags: z.array(z.string()).optional(),
-//       sentiment_score: z.number().optional(),
-//     })
-//     .optional(),
-// });
 
 export const PersonaCreationInputSchema = z.object({
   user_id: z.string(),
@@ -94,7 +109,7 @@ export const PersonaCreationInputSchema = z.object({
   persona_description: z.string().optional(),
 
   form_sections: z.array(FormSectionSchema),
-  file_uploads: FileUploadArraySchema,
+  file_uploads: FileUploadArraySchema.optional(),
 
   global_settings: z.object({
     default_tone: PersonaToneEnum.optional().default("friendly"),
@@ -168,45 +183,31 @@ export const QueryAnalysisOutputSchema = z.object({
   query_intent: z.object({
     primary_intent: QueryIntentEnum,
     secondary_intents: z.array(QueryIntentEnum).optional(),
-    confidence: z.number(),
+    confidence: z.number().min(0).max(1),
   }),
 
-  required_information: z.object({
-    required_topics: z.array(z.string()),
-    required_tags: z.array(z.string()),
-    required_content_types: z.array(ContentTypeEnum),
+  // Search filters using the same metadata fields
+  search_filters: z.object({
+    topics: z.array(z.string()).optional(),
+    tags: z.array(z.string()).optional(),
+    content_types: z.array(ContentTypeEnum).optional(),
+    importance_threshold: ImportanceEnum.optional(),
     temporal_requirements: z
       .object({
-        prefer_current: z.boolean(),
-        prefer_historical: z.boolean(),
+        prefer_current: z.boolean().default(false),
+        prefer_historical: z.boolean().default(false),
         specific_time_period: z.string().optional(),
       })
       .optional(),
-    importance_threshold: ImportanceEnum.optional(),
+    relevance_scope: z.array(z.string()).optional(),
+    min_confidence: z.number().min(0).max(1).optional(),
   }),
 
-  search_parameters: z.object({
-    query_embeddings: z.array(z.number()).optional(),
-    search_keywords: z.array(z.string()),
-    filter_criteria: z.object({
-      topics: z.array(z.string()).optional(),
-      tags: z.array(z.string()).optional(),
-      content_types: z.array(ContentTypeEnum).optional(),
-      date_range: z
-        .object({
-          from: z.date().optional(),
-          to: z.date().optional(),
-        })
-        .optional(),
-      min_importance: ImportanceEnum.optional(),
-    }),
-    result_limit: z.number().optional(),
-  }),
-
-  response_style: z.object({
-    recommended_tone: PersonaToneEnum,
-    recommended_length: RecommendedLengthEnum,
-    should_include_examples: z.boolean(),
-    should_include_personal_touch: z.boolean(),
+  search_keywords: z.array(z.string()),
+  recommended_response_style: z.object({
+    tone: PersonaToneEnum,
+    length: z.enum(["short", "medium", "long"]),
+    include_examples: z.boolean(),
+    include_personal_touch: z.boolean(),
   }),
 });

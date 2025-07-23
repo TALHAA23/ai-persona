@@ -25,7 +25,14 @@ export default async function readFiles(
         }
 
         const text = await data.text();
-        return { text, metadata: files[index].metadata };
+        return {
+          text,
+          metadata: {
+            ...files[index].metadata,
+            user_id: userId,
+            persona_id: personaId,
+          },
+        };
       });
 
     const results = await Promise.allSettled(promises);

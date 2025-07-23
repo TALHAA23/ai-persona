@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 export default function Form() {
   const [form, setForm] = useState({
@@ -41,24 +41,125 @@ export default function Form() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formData = new FormData(e.currentTarget);
-    // ["topics", "keywords", "tags"].map((item) => {
-    //   const field = formData.get(item);
-    //   console.log(field);
-    // });
-    // return;
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const globalsSettings: Record<string, any> = {};
+    Array.from(formData.entries()).map(([key, value]) => {
+      if (key.startsWith("global_settings")) {
+        const newKey = key.split(".").pop() || "globals";
+        globalsSettings[newKey] = value;
+        formData.delete(key);
+      }
+    });
+    formData.set("global_settings", JSON.stringify(globalsSettings));
+
+    const formSections = [
+      {
+        section_id: "1111",
+        section_name: "basic_information",
+        is_completed: false,
+        data: {
+          name: "talha",
+          fathername: "sifat",
+          age: 21,
+          profession: "programmer",
+          gender: "male",
+          nationality: "Pakistani",
+          marital_status: "single",
+          date_of_birth: "2003-05-12",
+          address: "123 Main Street, Lahore",
+          phone_number: "+92-300-1234567",
+          email: "talha@example.com",
+          hobbies: ["reading", "coding", "football"],
+          languages_spoken: ["English", "Urdu"],
+          education: "Bachelor's in Computer Science",
+          blood_group: "B+",
+          emergency_contact: {
+            name: "Ali Sifat",
+            relation: "father",
+            phone: "+92-300-7654321",
+          },
+        },
+        metadata: {
+          content_type: "mixed",
+          category: "other",
+          topics: ["basic information"],
+          keywords: ["biography"],
+          tags: ["life"],
+          importance: "high",
+          confidence_level: 0.6,
+          title: "users basic information",
+          description: "this is some basic info about this user or persona",
+          relevance_scope: [
+            "when asked about user very basic info like name, age etc",
+          ],
+          audience_tags: ["anyone"],
+          temporal_context: {},
+        },
+      },
+      {
+        section_id: "1111",
+        section_name: "basic_information",
+        is_completed: false,
+        data: {
+          name: "talha",
+          fathername: "sifat",
+          age: 21,
+          profession: "programmer",
+          gender: "male",
+          nationality: "Pakistani",
+          marital_status: "single",
+          date_of_birth: "2003-05-12",
+          address: "123 Main Street, Lahore",
+          phone_number: "+92-300-1234567",
+          email: "talha@example.com",
+          hobbies: ["reading", "coding", "football"],
+          languages_spoken: ["English", "Urdu"],
+          education: "Bachelor's in Computer Science",
+          blood_group: "B+",
+          emergency_contact: {
+            name: "Ali Sifat",
+            relation: "father",
+            phone: "+92-300-7654321",
+          },
+        },
+        metadata: {
+          content_type: "mixed",
+          topics: ["basic information"],
+          category: "other",
+          keywords: ["biography"],
+          tags: ["life"],
+          importance: "high",
+          confidence_level: 0.6,
+          title: "users basic information",
+          description: "this is some basic info about this user or persona",
+          relevance_scope: [
+            "when asked about user very basic info like name, age etc",
+          ],
+          audience_tags: ["anyone"],
+          temporal_context: {},
+        },
+      },
+    ];
+
+    formData.set("form_sections", JSON.stringify(formSections));
 
     // Collect all file inputs by index
     const files: File[] = [];
+
     const fileMetadatas: any[] = [];
     let i = 0;
     while (true) {
       const file = formData.get(`file_${i}`) as File;
       if (!file) break;
+      if (!file.size) {
+        i++;
+        continue;
+      }
 
       // Collect metadata for this file
       const metadata = {
         title: formData.get(`file_title_${i}`),
+        category: "other",
         description: formData.get(`file_description_${i}`),
         content_type: formData.get(`file_content_type_${i}`),
         topics: [formData.get(`file_topics_${i}`)],
@@ -67,6 +168,7 @@ export default function Form() {
         importance: formData.get(`file_importance_${i}`),
         tags: [formData.get(`file_tags_${i}`)],
         context_notes: formData.get(`file_context_notes_${i}`),
+        temporal_context: {},
       };
 
       files.push(file);
@@ -87,15 +189,16 @@ export default function Form() {
       formData.delete(`file_tags_${j}`);
       formData.delete(`file_context_notes_${j}`);
     }
+    console.log(files);
 
     // Append files and metadata as arrays
-    console.log(files, fileMetadatas);
-    files.forEach((file) => {
-      formData.append("file_uploads", file);
-    });
+    if (files.length) {
+      files.forEach((file) => {
+        formData.append("file_uploads", file);
+      });
 
-    formData.append("file_uploads_metadata", JSON.stringify(fileMetadatas));
-    console.log([...formData.entries()]);
+      formData.append("file_uploads_metadata", JSON.stringify(fileMetadatas));
+    }
     await fetch("/api/persona/upload", {
       method: "POST",
       body: formData,

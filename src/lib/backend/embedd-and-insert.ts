@@ -7,10 +7,10 @@ import {
   SUPABASE_TABLES,
 } from "@/utils/shared/CONST";
 import z from "zod";
-import { ChunkDocumentSchema } from "@/types/schemas";
+import { ChunkDocumentsSchema } from "@/types/schemas";
 
 export default async function embedAndInsert(
-  docs: z.infer<typeof ChunkDocumentSchema>[]
+  docs: z.infer<typeof ChunkDocumentsSchema>
 ) {
   try {
     const embeddings = new GoogleGenerativeAIEmbeddings({

@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import embedAndInsert from "@/lib/backend/embedd-and-insert";
 import z from "zod";
 import createFormDataChunks from "@/lib/backend/create-form-data-chunks";
-import { resolvePersonaCreationData } from "@/utils/backend";
 import {
-  FileUploadArraySchema,
-  PersonaCreationInputSchema,
-} from "@/types/schemas";
+  createMetadataFromForm,
+  resolvePersonaCreationData,
+} from "@/utils/backend";
+import { PersonaCreationInputSchema } from "@/types/schemas";
 import uploadFiles from "@/lib/backend/uploadFiles";
 import readFiles from "@/lib/backend/readFiles";
 import createChunks from "@/lib/backend/create-chunks-from-files-content";
@@ -15,15 +15,33 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const resolvedData = resolvePersonaCreationData(formData);
-    const parsedFiles = FileUploadArraySchema.parse(resolvedData.file_uploads);
-    const uploadedFiles = await uploadFiles("0001", "alex-morgen", parsedFiles);
-    const content = await readFiles("0001", "alex-morgen", uploadedFiles);
-    const docs = await createChunks(content);
-    console.log(docs);
-    return NextResponse.json("ok");
-    const parsed = PersonaCreationInputSchema.parse("data");
-    const response = await createFormDataChunks(parsed);
-    await embedAndInsert(response);
+    const parsed = PersonaCreationInputSchema.parse(resolvedData);
+
+    // update metadata for each form section
+    parsed.form_sections = parsed.form_sections.map((section) => ({
+      ...section,
+      metadata: createMetadataFromForm(
+        section.section_id,
+        section.section_name,
+        parsed
+      ),
+    }));
+
+    // data from forms
+    const docsFromFormSections = await createFormDataChunks(
+      parsed.form_sections
+    );
+    await embedAndInsert(docsFromFormSections);
+
+    // data from files
+    if (parsed.file_uploads?.length) {
+      const { user_id, persona_name, file_uploads } = parsed;
+      const uploads = await uploadFiles(user_id, persona_name, file_uploads);
+      const filesContent = await readFiles(user_id, persona_name, uploads);
+      const docsFromFilesContent = await createChunks(filesContent);
+      await embedAndInsert(docsFromFilesContent);
+    }
+
     return NextResponse.json({
       success: true,
       message: "Successfully Inserted!",

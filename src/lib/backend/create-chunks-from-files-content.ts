@@ -21,5 +21,6 @@ export default async function createChunksFromFilesContent(
   const results = await Promise.allSettled(chunks);
   return results
     .filter((result) => result.status == "fulfilled")
-    .map((item) => item.value);
+    .map((item) => item.value)
+    .flat();
 }
