@@ -50,3 +50,5 @@ export const QueryIntentEnum = z.enum([
   "advice_guidance",
   "general_chat",
 ]);
+
+export const GenderEnums = z.enum(["male", "female", "prefer_not_to_say"]);

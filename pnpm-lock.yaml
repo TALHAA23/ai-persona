@@ -20,6 +20,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.50.3
         version: 2.50.3
+      animejs:
+        specifier: ^4.1.1
+        version: 4.1.1
       langchain:
         specifier: ^0.3.29
         version: 0.3.29(@langchain/core@0.3.62(openai@5.8.2(ws@8.18.3)(zod@3.25.76)))(@langchain/google-genai@0.2.14(@langchain/core@0.3.62(openai@5.8.2(ws@8.18.3)(zod@3.25.76))))(axios@1.10.0)(openai@5.8.2(ws@8.18.3)(zod@3.25.76))(ws@8.18.3)
@@ -1269,6 +1272,9 @@ packages:
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
 
+  animejs@4.1.1:
+    resolution: {integrity: sha512-IQiV/Mxg5/ViKlRPGUYcZzj9Me6zQRTQQOTtNTXEEVY4VjeokGjGxpKjaBf7nO+q/kgaqC2HKfUlawGvvnrPwQ==}
+
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
@@ -2492,6 +2498,7 @@ packages:
     resolution: {integrity: sha512-Nkwo9qeCvqVH0ZgYRUfPyj6o4o7StvNIxMFECeiz4y0uMOVyqc5Y9hjsdFVxdYCeiUjjXLQXA8KIz0iJL3HM0w==}
     engines: {node: '>=20.18.0'}
     hasBin: true
+    bundledDependencies: []
 
   pdfjs-dist@5.3.93:
     resolution: {integrity: sha512-w3fQKVL1oGn8FRyx5JUG5tnbblggDqyx2XzA5brsJ5hSuS+I0NdnJANhmeWKLjotdbPQucLBug5t0MeWr0AAdg==}
@@ -3807,6 +3814,8 @@ snapshots:
       fast-json-stable-stringify: 2.1.0
       json-schema-traverse: 0.4.1
       uri-js: 4.4.1
+
+  animejs@4.1.1: {}
 
   ansi-regex@5.0.1: {}
 
