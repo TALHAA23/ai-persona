@@ -13,6 +13,6 @@ export const BasicIdentitySchema = z.object({
   current_location: z.string().optional(),
 });
 
-export const formSectionsSchema = z.object({
+export const FormSectionsSchema = z.object({
   basicIdentity: BasicIdentitySchema,
 });
