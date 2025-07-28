@@ -15,10 +15,15 @@ const inputVariants = cva(
         "1/2": "w-1/2",
         "1/3": "w-1/3",
       },
+      error: {
+        default: "focus:invalid:border-red-500",
+        redError: "invalid:border-red-500 border-red-500",
+      },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
+      error: "default",
     },
   }
 );
@@ -31,11 +36,12 @@ export default function Input({
   className,
   variant,
   size,
+  error,
   ...props
 }: InputProps) {
   return (
     <input
-      className={cn(inputVariants({ variant, size }), className)}
+      className={cn(inputVariants({ variant, size, error }), className)}
       {...props}
     />
   );

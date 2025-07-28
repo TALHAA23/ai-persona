@@ -23,15 +23,7 @@ const reducer = (
 ): NullableFormSectionsState => {
   switch (action.type) {
     case "RESET":
-      return {
-        ...state,
-        basicIdentity: {
-          age: 29,
-          full_name: "some name",
-          nationality: "pk",
-          gender: "male",
-        },
-      };
+      return state;
 
     default:
       return state;

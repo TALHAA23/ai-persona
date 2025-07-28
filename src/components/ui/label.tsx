@@ -1,10 +1,10 @@
 import { cn } from "@/utils/frontend/cn";
 import { cva, VariantProps } from "class-variance-authority";
 
-const labelVariants = cva("text-sm", {
+const labelVariants = cva("text-sm text-inherit", {
   variants: {
     variant: {
-      normal: "text-white",
+      normal: "",
       error: "text-red-500",
     },
   },

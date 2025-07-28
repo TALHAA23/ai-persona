@@ -1,5 +1,11 @@
+import z from "zod";
+import { BasicIdentitySchema } from "./schemas.client";
+
 export type FormSectionActions =
-  | { type: "SET_NAME"; payload: string }
+  | {
+      type: "UPDATE_BASIC_IDENTITY";
+      payload: z.infer<typeof BasicIdentitySchema>;
+    }
   | { type: "TOGGLE_ACTIVE" }
   | { type: "RESET" };
 
