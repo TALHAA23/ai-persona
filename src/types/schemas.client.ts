@@ -2,9 +2,9 @@ import z from "zod";
 import { GenderEnums } from "./enums";
 
 export const BasicIdentitySchema = z.object({
-  firstName: z.string(),
-  lastName: z.string(),
-  age: z.number().int().min(1).max(120),
+  firstName: z.string().nonempty(),
+  lastName: z.string().nonempty(),
+  age: z.coerce.number().int().min(1).max(120),
   gender: GenderEnums,
   nationality: z.string(),
 

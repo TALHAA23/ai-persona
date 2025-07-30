@@ -16,8 +16,8 @@ const inputVariants = cva(
         "1/3": "w-1/3",
       },
       error: {
-        default: "focus:invalid:border-red-500",
-        redError: "invalid:border-red-500 border-red-500",
+        default: "",
+        redBorder: "border-red-500 border shadow",
       },
     },
     defaultVariants: {
