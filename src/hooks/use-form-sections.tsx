@@ -22,8 +22,11 @@ const reducer = (
   action: FormSectionActions
 ): NullableFormSectionsState => {
   switch (action.type) {
-    case "RESET":
-      return state;
+    case "UPDATE_BASIC_IDENTITY":
+      return { ...state, basicIdentity: action.payload };
+
+    case "UPDATE_PERSONA_CONFIGS":
+      return { ...state, personaConfigs: action.payload };
 
     default:
       return state;

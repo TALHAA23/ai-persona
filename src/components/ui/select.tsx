@@ -37,17 +37,33 @@ const selectVariants = cva("relative", {
 });
 
 interface SelectProps
-  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "size">,
+  extends Omit<
+      React.SelectHTMLAttributes<HTMLSelectElement>,
+      "size" | "onChange"
+    >,
     VariantProps<typeof selectVariants> {
   children: React.ReactNode;
+  onChange: (value: string) => void;
+  value: string;
 }
 
-export function Select({ children, size, className }: SelectProps) {
+export function Select({
+  children,
+  size,
+  className,
+  value,
+  onChange,
+}: SelectProps) {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
+
+  const setSelected = (val: string) => {
+    onChange(val);
+  };
 
   return (
-    <SelectContext.Provider value={{ open, setOpen, selected, setSelected }}>
+    <SelectContext.Provider
+      value={{ open, setOpen, selected: value, setSelected }}
+    >
       <div className={cn(selectVariants({ size }), className)}>{children}</div>
     </SelectContext.Provider>
   );
@@ -67,6 +83,10 @@ const selectTriggerVariants = cva(
         default: "",
         glass: glassVariant,
       },
+      error: {
+        true: "border border-red-500 shadow",
+        false: "",
+      },
     },
     defaultVariants: {
       variants: "default",
@@ -83,6 +103,7 @@ interface SelectTriggerProps
 export function SelectTrigger({
   placeholder = "Select...",
   variants,
+  error,
   className,
 }: SelectTriggerProps) {
   const { open, setOpen, selected } = useSelectContext();
@@ -91,7 +112,7 @@ export function SelectTrigger({
     <button
       type="button"
       onClick={() => setOpen(!open)}
-      className={cn(selectTriggerVariants({ variants }), className)}
+      className={cn(selectTriggerVariants({ variants, error }), className)}
     >
       <span>
         {selected || (

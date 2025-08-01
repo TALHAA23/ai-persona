@@ -1,17 +1,12 @@
-import { animate, stagger } from "animejs";
+import { ANIMEJS_ANIMATION_CLASSES } from "@/utils/shared/CONST";
+import { animate } from "animejs";
 export default function formSlideUp() {
-  animate(".animate-form-slide-up", {
+  animate("." + ANIMEJS_ANIMATION_CLASSES.CONTAINERS_ANIMATION.SLIDE_UP, {
     y: [
       {
         from: "100%",
       },
     ],
     duration: 1500,
-  });
-
-  animate(".form-field", {
-    opacity: { from: 0, to: 1 },
-    delay: stagger(100, { start: 1500 }),
-    duration: 500,
   });
 }

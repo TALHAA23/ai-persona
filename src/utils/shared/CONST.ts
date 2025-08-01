@@ -20,3 +20,13 @@ export const SUPABASE_TABLES = {
   AI_PERSONA: "ai_persona",
   EMBEDDINGS: "ai_embeddings",
 };
+
+export const ANIMEJS_ANIMATION_CLASSES = {
+  WORDS_ANIMATIONS: {
+    SLIDE_DOWN: "animate-word-slide-down",
+  },
+  FORM_FIELD_SHOWING: "animated-field-showing",
+  CONTAINERS_ANIMATION: {
+    SLIDE_UP: "animate-container-slide-up",
+  },
+};

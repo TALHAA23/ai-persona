@@ -16,14 +16,14 @@ const inputVariants = cva(
         "1/3": "w-1/3",
       },
       error: {
-        default: "",
-        redBorder: "border-red-500 border shadow",
+        true: "border-red-500 border shadow",
+        false: "",
       },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
-      error: "default",
+      error: false,
     },
   }
 );

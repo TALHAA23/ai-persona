@@ -24,19 +24,23 @@ interface ButtonProps
     VariantProps<typeof buttonVariants>,
     Partial<Pick<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href">> {
   as?: React.ElementType;
+  type?: "button" | "submit" | "reset";
 }
 
 export default function Button({
   as = "button",
+  type = "button",
   size,
   variant,
   href,
   className,
+
   ...props
 }: ButtonProps) {
   const Component = href ? Link : as;
   return (
     <Component
+      type={type}
       href={href}
       className={cn(buttonVariants({ size, variant }), className)}
       {...props}
