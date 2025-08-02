@@ -16,7 +16,10 @@ export type FormSectionActions =
   | { type: "TOGGLE_ACTIVE" }
   | { type: "RESET" };
 
-export type FormSearchParams = "persona-config" | "basic";
+export type FormSearchParams =
+  | "persona-config"
+  | "basic"
+  | "culture-and-language-background";
 export interface SearchParams {
   form: FormSearchParams;
 }

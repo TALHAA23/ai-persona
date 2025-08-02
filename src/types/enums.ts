@@ -5,6 +5,12 @@ export const CategoriesEnum = z.enum(["work", "hobbies", "personal", "other"]);
 export const ImportanceEnum = z.enum(["low", "medium", "high"]);
 export const PrivacyLevelEnum = z.enum(["public", "private", "selective"]);
 export const RecommendedLengthEnum = z.enum(["short", "medium", "long"]);
+export const LanguageProficiencyEnum = z.enum([
+  "basic",
+  "intermediate",
+  "fluent",
+  "native",
+]);
 
 export const ContentTypeEnum = z.enum([
   "narrative",

@@ -13,6 +13,7 @@ import { useFormSections } from "@/hooks/use-form-sections";
 import { BasicIdentitySchema } from "@/types/schemas.client";
 import z from "zod";
 import { ANIMEJS_ANIMATION_CLASSES } from "@/utils/shared/CONST";
+import useFormNavigator from "@/hooks/use-form-navigator";
 
 const GENDER_OPTIONS = {
   MALE: "male",
@@ -21,10 +22,12 @@ const GENDER_OPTIONS = {
 };
 
 export default function BasicInfo() {
+  const goto = useFormNavigator();
+  const { dispatch, state } = useFormSections();
+  const prevData = useRef(state.basicIdentity).current;
   const scope = useRef<Scope>(null);
   const root = useRef<HTMLFormElement>(null);
-  const [gender, setGender] = useState("");
-  const { dispatch } = useFormSections();
+  const [gender, setGender] = useState(prevData?.gender || "");
   const [error, setError] =
     useState<
       z.inferFlattenedErrors<typeof BasicIdentitySchema>["fieldErrors"]
@@ -48,6 +51,8 @@ export default function BasicInfo() {
     try {
       const parsed = BasicIdentitySchema.parse(additionalData);
       dispatch({ type: "UPDATE_BASIC_IDENTITY", payload: parsed });
+      setError(undefined);
+      goto("culture-and-language-background");
     } catch (err) {
       if (err instanceof z.ZodError) {
         setError(err.flatten().fieldErrors);
@@ -85,6 +90,9 @@ export default function BasicInfo() {
                 </Label>
                 <Input
                   error={index == 0 ? !!error?.firstName : !!error?.lastName}
+                  defaultValue={
+                    index == 0 ? prevData?.firstName : prevData?.lastName
+                  }
                   id={item}
                   name={item}
                   variant={"glass"}
@@ -96,6 +104,7 @@ export default function BasicInfo() {
             <Label htmlFor="age">Age</Label>
             <Input
               error={!!error?.age}
+              defaultValue={prevData?.age}
               id="age"
               name="age"
               max={120}
@@ -126,6 +135,7 @@ export default function BasicInfo() {
           <div className={ANIMEJS_ANIMATION_CLASSES.FORM_FIELD_SHOWING}>
             <Label htmlFor="nationality">Nationality</Label>
             <Input
+              defaultValue={prevData?.nationality}
               id="nationality"
               name="nationality"
               required
@@ -133,12 +143,22 @@ export default function BasicInfo() {
             />
           </div>
         </div>
-        <Button
-          type="submit"
-          className={ANIMEJS_ANIMATION_CLASSES.FORM_FIELD_SHOWING}
-        >
-          Click Me
-        </Button>
+        <div className="w-full flex gap-1">
+          <Button
+            onClick={() => goto("persona-config")}
+            className={ANIMEJS_ANIMATION_CLASSES.FORM_FIELD_SHOWING}
+            icon={"arrowLeft"}
+          >
+            Previous
+          </Button>
+          <Button
+            type="submit"
+            className={ANIMEJS_ANIMATION_CLASSES.FORM_FIELD_SHOWING}
+            icon={"arrowRight"}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </form>
   );

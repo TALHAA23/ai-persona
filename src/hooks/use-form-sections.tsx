@@ -4,23 +4,22 @@ import { FormSectionActions } from "@/types/types.client";
 import React, { createContext, useContext, ReactNode, useReducer } from "react";
 import z from "zod";
 
-// 1. Define the full state type
 type FormSectionsContextType = z.infer<typeof FormSectionsSchema>;
 
-// 2. Initial state can be null (lazy start)
-type NullableFormSectionsState = FormSectionsContextType | null;
+// Allow partial updates
+type PartialFormSectionsState = Partial<FormSectionsContextType>;
 
-// 3. Provide correct context
+// Context allows this flexible structure
 const FormSectionsContext = createContext<{
-  state: NullableFormSectionsState;
+  state: PartialFormSectionsState;
   dispatch: React.Dispatch<FormSectionActions>;
 } | null>(null);
 
-// 4. Reducer must handle null state
+// Reducer allows updates to partial sections
 const reducer = (
-  state: NullableFormSectionsState,
+  state: PartialFormSectionsState,
   action: FormSectionActions
-): NullableFormSectionsState => {
+): PartialFormSectionsState => {
   switch (action.type) {
     case "UPDATE_BASIC_IDENTITY":
       return { ...state, basicIdentity: action.payload };
@@ -33,9 +32,10 @@ const reducer = (
   }
 };
 
-// 5. Provider component
+// Start with empty object (not null)
 const FormSectionsProvider = ({ children }: { children: ReactNode }) => {
-  const [state, dispatch] = useReducer(reducer, null);
+  const [state, dispatch] = useReducer(reducer, {});
+  console.log(state);
 
   return (
     <FormSectionsContext.Provider value={{ state, dispatch }}>

@@ -1,6 +1,7 @@
 import z from "zod";
 import {
   GenderEnums,
+  LanguageProficiencyEnum,
   PersonaToneEnum,
   PersonaTypeEnum,
   PrivacyLevelEnum,
@@ -39,7 +40,22 @@ export const PersonaConfigurationSchema = z.object({
   }),
 });
 
+export const CulturalLanguageBackgroundSchema = z.object({
+  native_language: z.string().nonempty(),
+  other_languages: z.array(z.string()).default([]),
+  religion: z.string().default("none"),
+  cultural_identity: z.string(),
+
+  language_proficiency: z.record(LanguageProficiencyEnum).optional(),
+
+  accents_or_dialects: z.array(z.string()).optional(),
+  festivals_celebrated: z.array(z.string()).optional(),
+  customs_or_norms: z.array(z.string()).optional(),
+  cultural_references: z.array(z.string()).optional(),
+});
+
 export const FormSectionsSchema = z.object({
   basicIdentity: BasicIdentitySchema,
   personaConfigs: PersonaConfigurationSchema,
+  cultureAndLanguageBackground: CulturalLanguageBackgroundSchema,
 });

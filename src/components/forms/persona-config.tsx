@@ -14,6 +14,7 @@ import Button from "../ui/button";
 import z from "zod";
 import { PersonaConfigurationSchema } from "@/types/schemas.client";
 import { useFormSections } from "@/hooks/use-form-sections";
+import useFormNavigator from "@/hooks/use-form-navigator";
 
 const OPTIONS = {
   TONE: [
@@ -40,12 +41,21 @@ const OPTIONS = {
 };
 
 export default function PersonaConfig() {
-  const { dispatch } = useFormSections();
+  const goto = useFormNavigator();
+  const { dispatch, state } = useFormSections();
+  const prevData = useRef(state.personaConfigs).current;
   const scope = useRef<Scope>(null);
   const root = useRef<HTMLFormElement>(null);
-  const [tone, setTone] = useState("");
-  const [type, setType] = useState("");
-  const [privacy, setPrivacy] = useState("");
+
+  const [tone, setTone] = useState(
+    prevData?.global_settings.default_tone || ""
+  );
+  const [type, setType] = useState(
+    prevData?.global_settings.default_persona_type || ""
+  );
+  const [privacy, setPrivacy] = useState(
+    prevData?.global_settings.privacy_level || ""
+  );
   const [error, setError] =
     useState<
       z.inferFlattenedErrors<typeof PersonaConfigurationSchema>["fieldErrors"]
@@ -78,13 +88,13 @@ export default function PersonaConfig() {
       const parsed = PersonaConfigurationSchema.parse(additionalData);
       dispatch({ type: "UPDATE_PERSONA_CONFIGS", payload: parsed });
       setError(undefined);
+      goto("basic");
     } catch (error) {
       if (error instanceof z.ZodError) {
         setError(error.flatten().fieldErrors);
       }
     }
   };
-  console.log(error);
 
   return (
     <form
@@ -115,9 +125,14 @@ export default function PersonaConfig() {
               variant={"glass"}
               id="persona_name"
               name="persona_name"
+              defaultValue={prevData?.persona_name}
             />
           </div>
-          <Select onChange={setTone} value={tone}>
+          <Select
+            onChange={setTone}
+            value={tone}
+            className={ANIMEJS_ANIMATION_CLASSES.FORM_FIELD_SHOWING}
+          >
             <SelectTrigger placeholder="Persona Tone" variants={"glass"} />
             <SelectContent>
               {OPTIONS.TONE.map((tone, index) => (
@@ -127,7 +142,11 @@ export default function PersonaConfig() {
               ))}
             </SelectContent>
           </Select>
-          <Select onChange={setType} value={type}>
+          <Select
+            onChange={setType}
+            value={type}
+            className={ANIMEJS_ANIMATION_CLASSES.FORM_FIELD_SHOWING}
+          >
             <SelectTrigger placeholder="Persona Type" variants={"glass"} />
             <SelectContent>
               {OPTIONS.TYPE.map((type, index) => (
@@ -137,7 +156,11 @@ export default function PersonaConfig() {
               ))}
             </SelectContent>
           </Select>
-          <Select onChange={setPrivacy} value={privacy}>
+          <Select
+            onChange={setPrivacy}
+            value={privacy}
+            className={ANIMEJS_ANIMATION_CLASSES.FORM_FIELD_SHOWING}
+          >
             <SelectTrigger placeholder="Visability" variants={"glass"} />
             <SelectContent>
               {OPTIONS.PRIVACY.map((privacy, index) => (
@@ -147,15 +170,20 @@ export default function PersonaConfig() {
               ))}
             </SelectContent>
           </Select>
-          <Label htmlFor="persona_description">Description</Label>
-          <TextArea
-            name="persona_description"
-            id="persona_description"
-            variant={"glass"}
-            placeholder="Describe your Persona"
-          />
+          <div className={ANIMEJS_ANIMATION_CLASSES.FORM_FIELD_SHOWING}>
+            <Label htmlFor="persona_description">Description</Label>
+            <TextArea
+              name="persona_description"
+              id="persona_description"
+              variant={"glass"}
+              placeholder="Describe your Persona"
+              defaultValue={prevData?.persona_description}
+            />
+          </div>
         </div>
-        <Button type="submit">Submit</Button>
+        <Button type="submit" icon={"arrowRight"}>
+          Next
+        </Button>
       </div>
     </form>
   );
