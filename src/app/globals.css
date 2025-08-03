@@ -41,22 +41,11 @@ body {
 
 /* Style the entire scrollbar */
 .thin-scrollbar::-webkit-scrollbar {
-  width: 10px;
+  width: 2px;
   height: 3px;
 }
 
 /* Style the scrollbar track */
 .thin-scrollbar::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-/* Style the scrollbar thumb */
-.thin-scrollbar::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 5px;
-}
-
-/* Change thumb color on hover */
-.thin-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #f1f1f18a;
 }

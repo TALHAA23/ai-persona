@@ -57,4 +57,20 @@ export const QueryIntentEnum = z.enum([
   "general_chat",
 ]);
 
+export const PersonalityTypeEnum = z.enum([
+  "introvert",
+  "extrovert",
+  "ambivert",
+]);
+
+export const EmotionalExpressionLevelEnum = z.enum([
+  "reserved",
+  "balanced",
+  "expressive",
+]);
+
+export const FormalityLevelEnum = z.enum(["formal", "semi-formal", "casual"]);
+export const ResponseLengthEnum = z.enum(["short", "medium", "detailed"]);
+export const EmojiUseFrequencey = z.enum(["never", "sometimes", "frequently"]);
+
 export const GenderEnums = z.enum(["male", "female", "prefer_not_to_say"]);

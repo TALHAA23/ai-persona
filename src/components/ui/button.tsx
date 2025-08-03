@@ -2,6 +2,7 @@ import { cn } from "@/utils/frontend/cn";
 import { cva, VariantProps } from "class-variance-authority";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import React from "react";
 
 const buttonVariants = cva(
   "cursor-pointer hover:opacity-75 text-center rounded text-white px-3 py-2 bg-fuchsia-600 active:scale-[98%]",
@@ -31,11 +32,13 @@ interface ButtonProps
     Partial<Pick<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href">> {
   as?: React.ElementType;
   type?: "button" | "submit" | "reset";
+  ref?: React.RefObject<HTMLButtonElement | null>;
 }
 
 export default function Button({
   as = "button",
   type = "button",
+  ref,
   size,
   variant,
   icon,
@@ -47,6 +50,7 @@ export default function Button({
   const Component = href ? Link : as;
   return (
     <Component
+      ref={ref}
       type={type}
       href={href}
       className={cn(buttonVariants({ size, variant, icon }), className)}

@@ -1,7 +1,10 @@
 import z from "zod";
 import {
   BasicIdentitySchema,
+  CulturalLanguageBackgroundSchema,
+  EducationBackgroundSchema,
   PersonaConfigurationSchema,
+  PersonalityAndBeliefsSchema,
 } from "./schemas.client";
 
 export type FormSectionActions =
@@ -13,13 +16,25 @@ export type FormSectionActions =
       type: "UPDATE_PERSONA_CONFIGS";
       payload: z.infer<typeof PersonaConfigurationSchema>;
     }
-  | { type: "TOGGLE_ACTIVE" }
-  | { type: "RESET" };
+  | {
+      type: "UPATE_CULTURE_AND_LANGUAGE_BACKGROUND";
+      payload: z.infer<typeof CulturalLanguageBackgroundSchema>;
+    }
+  | {
+      type: "UPDATE_PERSONALITY_AND_BELIEFS";
+      payload: z.infer<typeof PersonalityAndBeliefsSchema>;
+    }
+  | {
+      type: "UPDATE_EDUCATION_BACKGROUND";
+      payload: z.infer<typeof EducationBackgroundSchema>;
+    };
 
 export type FormSearchParams =
   | "persona-config"
   | "basic"
-  | "culture-and-language-background";
+  | "culture-and-language-background"
+  | "personality-and-beliefs"
+  | "education-background";
 export interface SearchParams {
   form: FormSearchParams;
 }

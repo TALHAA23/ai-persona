@@ -26,6 +26,12 @@ const reducer = (
 
     case "UPDATE_PERSONA_CONFIGS":
       return { ...state, personaConfigs: action.payload };
+    case "UPATE_CULTURE_AND_LANGUAGE_BACKGROUND":
+      return { ...state, cultureAndLanguageBackground: action.payload };
+    case "UPDATE_PERSONALITY_AND_BELIEFS":
+      return { ...state, personalityAndBeliefs: action.payload };
+    case "UPDATE_EDUCATION_BACKGROUND":
+      return { ...state, educationBackground: action.payload };
 
     default:
       return state;
