@@ -1,12 +1,10 @@
 import { animate } from "animejs";
 
-export function showDialogFromTop(
-  dialogRef: React.RefObject<HTMLDialogElement | null>
-) {
-  if (dialogRef.current)
-    return animate(dialogRef.current, {
+export function showDialogFromTop(dialogRef: HTMLDialogElement | null) {
+  if (dialogRef)
+    return animate(dialogRef, {
       y: {
-        from: "-500%",
+        from: "-100%",
         to: 0,
         ease: "inOut",
       },
@@ -14,24 +12,22 @@ export function showDialogFromTop(
         from: 0,
         to: 1,
       },
-      duration: 500,
+      duration: 1000,
     });
 }
-export function closeDialogCenterToBottom(
-  dialogRef: React.RefObject<HTMLDialogElement | null>
-) {
-  if (dialogRef.current)
-    return animate(dialogRef.current, {
+export function closeDialogCenterToBottom(dialogRef: HTMLDialogElement | null) {
+  if (dialogRef)
+    return animate(dialogRef, {
       y: {
         from: "0",
-        to: "400%",
+        to: "20%",
         ease: "inOut",
       },
       opacity: {
         from: 1,
         to: 0,
       },
-      duration: 500,
-      onComplete: () => dialogRef.current?.close(),
+      duration: 1000,
+      onComplete: () => dialogRef?.close(),
     });
 }

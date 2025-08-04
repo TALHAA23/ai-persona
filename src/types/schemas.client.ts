@@ -96,6 +96,14 @@ export const AIChatbotPreferencesSchema = z.object({
   name_as_referred_to: z.string().optional(),
 });
 
+export const EducationHistoryItemSchema = z.object({
+  degree: z.string().nonempty(),
+  field: z.string().nonempty(),
+  institution: z.string().nonempty(),
+  year: z.coerce.number().nonnegative().min(1900),
+  grade: z.string().optional(),
+});
+
 export const EducationBackgroundSchema = z.object({
   highest_degree: z.string().nonempty(),
   field_of_study: z.string().nonempty(),
@@ -103,17 +111,7 @@ export const EducationBackgroundSchema = z.object({
   graduation_year: z.coerce.number(),
 
   gpa_or_grade: z.string().optional(),
-  education_history: z
-    .array(
-      z.object({
-        degree: z.string().nonempty(),
-        field: z.string().nonempty(),
-        institution: z.string().nonempty(),
-        year: z.coerce.number().nonnegative().min(1900),
-        grade: z.string().optional(),
-      })
-    )
-    .optional(),
+  education_history: z.array(EducationHistoryItemSchema).optional(),
 
   academic_achievements: z.array(z.string()).optional(),
   favorite_subjects: z.array(z.string()).optional(),
