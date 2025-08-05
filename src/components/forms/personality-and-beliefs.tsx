@@ -21,6 +21,7 @@ import {
   PersonaToneEnum,
 } from "@/types/enums";
 import { capitalize } from "@/utils/frontend";
+import { PersonaCreationFormProps } from "@/types/types.client";
 
 const PERSONALITY_FIELD_INFO = {
   communication_style:
@@ -45,7 +46,11 @@ const PERSONALITY_FIELD_INFO = {
     "Words that describe your personality. These shape the chatbot's tone and behavior.",
 };
 
-export default function PersonalityAndBeliefs() {
+export default function PersonalityAndBeliefs({
+  next,
+  prev,
+  skippable,
+}: PersonaCreationFormProps) {
   const goto = useFormNavigator();
   const { dispatch, state } = useFormSections();
   const prevData = useRef(state.personalityAndBeliefs).current;
@@ -105,14 +110,13 @@ export default function PersonalityAndBeliefs() {
         type: "UPDATE_PERSONALITY_AND_BELIEFS",
         payload: parsed,
       });
-      goto("education-background");
+      if (next) goto(next);
     } catch (error) {
       if (error instanceof z.ZodError) {
         setErrors(error.flatten().fieldErrors);
       }
     }
   };
-  console.log(errors);
 
   return (
     <form
@@ -296,16 +300,29 @@ export default function PersonalityAndBeliefs() {
             setItems={setPersonalityTraits}
           />
         </div>
-        <div className="w-full flex gap-1">
-          <Button
-            icon={"arrowLeft"}
-            onClick={() => goto("culture-and-language-background")}
-          >
-            Previous
-          </Button>
-          <Button type="submit" icon={"arrowRight"}>
-            Next
-          </Button>
+        <div
+          className={
+            ANIMEJS_ANIMATION_CLASSES.FORM_FIELD_SHOWING + " w-full space-y-1"
+          }
+        >
+          {skippable && (
+            <Button
+              onClick={() => next && goto(next)}
+              className=" bg-gradient-to-l from-yellow-400 via-yellow-500 to-yellow-600"
+            >
+              Skip
+            </Button>
+          )}
+          <div className=" flex gap-1 w-full">
+            {prev && (
+              <Button icon={"arrowLeft"} onClick={() => goto(prev)}>
+                Previous
+              </Button>
+            )}
+            <Button type="submit" icon={"arrowRight"}>
+              Next
+            </Button>
+          </div>
         </div>
       </div>
     </form>

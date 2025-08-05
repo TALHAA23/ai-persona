@@ -35,6 +35,13 @@ export type FormSearchParams =
   | "culture-and-language-background"
   | "personality-and-beliefs"
   | "education-background";
+
 export interface SearchParams {
   form: FormSearchParams;
+}
+
+export interface PersonaCreationFormProps {
+  prev?: FormSearchParams;
+  next?: FormSearchParams;
+  skippable?: boolean;
 }

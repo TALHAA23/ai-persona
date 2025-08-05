@@ -1,3 +1,5 @@
+import { FormSearchParams } from "@/types/types.client";
+
 export const ERROR_TAGS = {
   LANGCHAIN_ERROR: "LANGCHAIN_ERROR",
   LANGCHAIN_CHUNKING_ERROR: "LANGCHAIN_CHUNKING_ERROR",
@@ -29,4 +31,12 @@ export const ANIMEJS_ANIMATION_CLASSES = {
   CONTAINERS_ANIMATION: {
     SLIDE_UP: "animate-container-slide-up",
   },
+};
+
+export const FORM_NAVIGATION_SEQUENCE: Record<string, FormSearchParams> = {
+  FORM1: "persona-config",
+  FORM2: "basic",
+  FORM3: "personality-and-beliefs",
+  FORM4: "culture-and-language-background",
+  FORM5: "education-background",
 };

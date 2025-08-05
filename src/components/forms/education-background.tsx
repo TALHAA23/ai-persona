@@ -20,6 +20,7 @@ import {
 import Dialog from "../ui/dialog";
 import { closeDialogCenterToBottom } from "@/animations/dialog-box-animes";
 import ObjectPreview from "../ui/object-preview";
+import { PersonaCreationFormProps } from "@/types/types.client";
 
 const EDUCATION_FIELD_INFO = {
   highest_degree:
@@ -38,7 +39,11 @@ const EDUCATION_FIELD_INFO = {
     "Subjects or areas you're naturally curious about, even outside your main degree.",
 };
 
-export default function EducationBackground() {
+export default function EducationBackground({
+  next,
+  prev,
+  skippable,
+}: PersonaCreationFormProps) {
   const goto = useFormNavigator();
   const { dispatch, state } = useFormSections();
   const prevData = useRef(state.educationBackground).current;
@@ -97,6 +102,7 @@ export default function EducationBackground() {
         payload: parsed,
       });
       setErrors(undefined);
+      if (next) goto(next);
     } catch (error) {
       if (error instanceof z.ZodError) {
         setErrors(error.flatten().fieldErrors);
@@ -285,20 +291,33 @@ export default function EducationBackground() {
             )}
           </div>
 
-          <div className="w-full space-y-1">
+          <div
+            className={
+              ANIMEJS_ANIMATION_CLASSES.FORM_FIELD_SHOWING + " w-full space-y-1"
+            }
+          >
             <Button ref={addEduButtonRef} className=" bg-purple-400">
               Add Education
             </Button>
-            <div className="w-full flex gap-1">
-              <Button
-                icon={"arrowLeft"}
-                onClick={() => goto("personality-and-beliefs")}
-              >
-                Previous
-              </Button>
-              <Button type="submit" icon={"arrowRight"}>
-                Next
-              </Button>
+            <div className="w-full space-y-1">
+              {skippable && (
+                <Button
+                  onClick={() => next && goto(next)}
+                  className=" bg-gradient-to-l from-yellow-400 via-yellow-500 to-yellow-600"
+                >
+                  Skip
+                </Button>
+              )}
+              <div className=" flex gap-1 w-full">
+                {prev && (
+                  <Button icon={"arrowLeft"} onClick={() => goto(prev)}>
+                    Previous
+                  </Button>
+                )}
+                <Button type="submit" icon={"arrowRight"}>
+                  Next
+                </Button>
+              </div>
             </div>
           </div>
         </div>

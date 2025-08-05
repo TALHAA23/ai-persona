@@ -43,7 +43,7 @@ export default function Dialog({
 
       <XCircle
         onClick={handleClose}
-        className="absolute -top-2 -right-2 cursor-pointer hover:opacity-70 fill-rose-700"
+        className="absolute -top-2 -right-2 text-white cursor-pointer hover:opacity-70 fill-rose-700"
       />
     </dialog>
   );

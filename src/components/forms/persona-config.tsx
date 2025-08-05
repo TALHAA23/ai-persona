@@ -15,6 +15,7 @@ import z from "zod";
 import { PersonaConfigurationSchema } from "@/types/schemas.client";
 import { useFormSections } from "@/hooks/use-form-sections";
 import useFormNavigator from "@/hooks/use-form-navigator";
+import { PersonaCreationFormProps } from "@/types/types.client";
 
 const OPTIONS = {
   TONE: [
@@ -40,7 +41,11 @@ const OPTIONS = {
   PRIVACY: ["public", "private"],
 };
 
-export default function PersonaConfig() {
+export default function PersonaConfig({
+  prev,
+  next,
+  skippable,
+}: PersonaCreationFormProps) {
   const goto = useFormNavigator();
   const { dispatch, state } = useFormSections();
   const prevData = useRef(state.personaConfigs).current;
@@ -88,7 +93,7 @@ export default function PersonaConfig() {
       const parsed = PersonaConfigurationSchema.parse(additionalData);
       dispatch({ type: "UPDATE_PERSONA_CONFIGS", payload: parsed });
       setError(undefined);
-      goto("basic");
+      if (next) goto(next);
     } catch (error) {
       if (error instanceof z.ZodError) {
         setError(error.flatten().fieldErrors);
@@ -181,9 +186,30 @@ export default function PersonaConfig() {
             />
           </div>
         </div>
-        <Button type="submit" icon={"arrowRight"}>
-          Next
-        </Button>
+        <div
+          className={
+            ANIMEJS_ANIMATION_CLASSES.FORM_FIELD_SHOWING + " w-full space-y-1"
+          }
+        >
+          {skippable && (
+            <Button
+              onClick={() => next && goto(next)}
+              className=" bg-gradient-to-l from-yellow-400 via-yellow-500 to-yellow-600"
+            >
+              Skip
+            </Button>
+          )}
+          <div className="flex gap-1 w-full">
+            {prev && (
+              <Button icon={"arrowLeft"} onClick={() => goto(prev)}>
+                Previous
+              </Button>
+            )}
+            <Button type="submit" icon={"arrowRight"}>
+              Next
+            </Button>
+          </div>
+        </div>
       </div>
     </form>
   );

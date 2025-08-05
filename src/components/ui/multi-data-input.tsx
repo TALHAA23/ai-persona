@@ -4,7 +4,7 @@ import { PlusSquare, XCircle } from "lucide-react";
 import { useRef } from "react";
 
 const multiDataInputVariants = cva(
-  "pl-2 w-full border-0 border-b h-10 focus:outline-none",
+  "peer pl-2 w-full border-0 border-b h-10 focus:outline-none ",
   {
     variants: {
       error: {
@@ -48,13 +48,13 @@ export default function MultiDataInput({
         <div className="thin-scrollbar flex flex-nowrap gap-1 overflow-x-auto py-2.5">
           {items.map((item, index) => (
             <p
-              className="group relative text-xs border rounded-full px-2 py-0.5 cursor-pointer"
+              className="relative text-xs border rounded-full px-2 py-0.5 cursor-pointer"
               key={item}
             >
               {item}
               <XCircle
                 onClick={() => handleItemDelete(index)}
-                className="size-4 absolute text-red-300 -top-2 -right-2 bg-red-500 rounded-full cursor-pointer invisible group-hover:visible"
+                className="size-4 absolute text-white -top-2 -right-2 bg-red-500 rounded-full cursor-pointer  [:not(peer-placeholder-shown)]:cursor-pointer"
               />
             </p>
           ))}
@@ -74,7 +74,7 @@ export default function MultiDataInput({
           }}
         />
         <PlusSquare
-          className="hover:bg-green-500 rounded  duration-150 cursor-pointer active:scale-95"
+          className="hover:bg-green-500 rounded  duration-150  active:scale-95 cursor-no-drop  [:not(:peer-empty)]:cursor-pointer"
           onClick={handleItemAdd}
         />
       </div>

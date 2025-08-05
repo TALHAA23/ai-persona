@@ -14,6 +14,7 @@ import { useFormSections } from "@/hooks/use-form-sections";
 import MultiDataInput from "../ui/multi-data-input";
 import z from "zod";
 import { CulturalLanguageBackgroundSchema } from "@/types/schemas.client";
+import { PersonaCreationFormProps } from "@/types/types.client";
 
 const CULTURAL_FIELD_INFO = {
   cultural_identity:
@@ -32,7 +33,11 @@ const CULTURAL_FIELD_INFO = {
     "Common media, art, or cultural elements you relate to or grew up with. Useful for casual conversation or metaphors. Examples: Bollywood films, Pakistani dramas, Quranic stories, Sufi poetry.",
 };
 
-export default function CultureAndLanguageBackground() {
+export default function CultureAndLanguageBackground({
+  next,
+  prev,
+  skippable,
+}: PersonaCreationFormProps) {
   const goto = useFormNavigator();
   const { dispatch, state } = useFormSections();
   const prevData = useRef(state.cultureAndLanguageBackground).current;
@@ -94,7 +99,7 @@ export default function CultureAndLanguageBackground() {
         type: "UPATE_CULTURE_AND_LANGUAGE_BACKGROUND",
         payload: parsed,
       });
-      goto("personality-and-beliefs");
+      if (next) goto(next);
     } catch (error) {
       if (error instanceof z.ZodError) {
         setErrors(error.flatten().fieldErrors);
@@ -102,13 +107,11 @@ export default function CultureAndLanguageBackground() {
     }
   };
 
-  console.log(errors);
-
   return (
     <form
       ref={root}
       onSubmit={handleSubmit}
-      className=" bg-fuchsia-400 w-full h-screen flex flex-col items-center overflow-hidden text-black"
+      className="bg-fuchsia-400 w-full h-screen flex flex-col items-center overflow-hidden text-black"
     >
       <Heading
         as="h1"
@@ -122,7 +125,7 @@ export default function CultureAndLanguageBackground() {
       <div
         className={
           ANIMEJS_ANIMATION_CLASSES.CONTAINERS_ANIMATION.SLIDE_UP +
-          " flex flex-col gap-2 justify-between items-start text-white w-[90%] max-w-[600px] h-full bottom-0 bg-white/10 backdrop-blur-lg border border-white/20 rounded-t-2xl overflow-y-auto p-3 shadow-2xl"
+          " thin-scrollbar flex flex-col gap-2 justify-between items-start text-white w-[90%] max-w-[600px] h-full bottom-0 bg-white/10 backdrop-blur-lg border border-white/20 rounded-t-2xl overflow-y-auto p-3 shadow-2xl"
         }
       >
         <div className="w-full">
@@ -213,13 +216,39 @@ export default function CultureAndLanguageBackground() {
             setItems={setCulturalReferences}
           />
         </div>
-        <div className="w-full flex gap-1">
-          <Button icon={"arrowLeft"} onClick={() => goto("basic")}>
-            Previous
-          </Button>
-          <Button type="submit" icon={"arrowRight"}>
-            Next
-          </Button>
+        <div className="w-full space-y-1">
+          {skippable && (
+            <Button
+              onClick={() => next && goto(next)}
+              className=" bg-gradient-to-l from-yellow-400 via-yellow-500 to-yellow-600"
+            >
+              Skip
+            </Button>
+          )}
+          <div
+            className={
+              ANIMEJS_ANIMATION_CLASSES.FORM_FIELD_SHOWING + " w-full space-y-1"
+            }
+          >
+            {skippable && (
+              <Button
+                onClick={() => next && goto(next)}
+                className=" bg-gradient-to-l from-yellow-400 via-yellow-500 to-yellow-600"
+              >
+                Skip
+              </Button>
+            )}
+            <div className=" flex gap-1 w-full">
+              {prev && (
+                <Button icon={"arrowLeft"} onClick={() => goto(prev)}>
+                  Previous
+                </Button>
+              )}
+              <Button type="submit" icon={"arrowRight"}>
+                Next
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </form>
