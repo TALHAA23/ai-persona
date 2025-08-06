@@ -34,7 +34,8 @@ export type FormSearchParams =
   | "basic"
   | "culture-and-language-background"
   | "personality-and-beliefs"
-  | "education-background";
+  | "education-background"
+  | "files";
 
 export interface SearchParams {
   form: FormSearchParams;

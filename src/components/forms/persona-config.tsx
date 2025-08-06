@@ -16,30 +16,12 @@ import { PersonaConfigurationSchema } from "@/types/schemas.client";
 import { useFormSections } from "@/hooks/use-form-sections";
 import useFormNavigator from "@/hooks/use-form-navigator";
 import { PersonaCreationFormProps } from "@/types/types.client";
-
-const OPTIONS = {
-  TONE: [
-    "formal",
-    "casual",
-    "friendly",
-    "professional",
-    "humorous",
-    "empathetic",
-    "conversational",
-    "adaptive",
-  ],
-  TYPE: [
-    "mentor",
-    "friend",
-    "professional",
-    "teacher",
-    "advisor",
-    "storyteller",
-    "creative",
-    "adaptive",
-  ],
-  PRIVACY: ["public", "private"],
-};
+import {
+  PersonaToneEnum,
+  PersonaTypeEnum,
+  PrivacyLevelEnum,
+} from "@/types/enums";
+import formSlideUp from "@/animations/formSlideUp";
 
 export default function PersonaConfig({
   prev,
@@ -69,7 +51,7 @@ export default function PersonaConfig({
   useEffect(() => {
     if (!root.current) return;
     scope.current = createScope({ root }).add(() => {
-      formFieldsShowingUp();
+      formSlideUp();
       formFieldsShowingUp();
       textSlideDown();
     });
@@ -140,7 +122,7 @@ export default function PersonaConfig({
           >
             <SelectTrigger placeholder="Persona Tone" variants={"glass"} />
             <SelectContent>
-              {OPTIONS.TONE.map((tone, index) => (
+              {PersonaToneEnum.options.map((tone, index) => (
                 <SelectItem key={index} value={tone}>
                   {capitalize(tone)}
                 </SelectItem>
@@ -154,7 +136,7 @@ export default function PersonaConfig({
           >
             <SelectTrigger placeholder="Persona Type" variants={"glass"} />
             <SelectContent>
-              {OPTIONS.TYPE.map((type, index) => (
+              {PersonaTypeEnum.options.map((type, index) => (
                 <SelectItem key={index} value={type}>
                   {capitalize(type)}
                 </SelectItem>
@@ -168,7 +150,7 @@ export default function PersonaConfig({
           >
             <SelectTrigger placeholder="Visability" variants={"glass"} />
             <SelectContent>
-              {OPTIONS.PRIVACY.map((privacy, index) => (
+              {PrivacyLevelEnum.options.map((privacy, index) => (
                 <SelectItem key={index} value={privacy}>
                   {capitalize(privacy)}
                 </SelectItem>

@@ -41,7 +41,6 @@ const reducer = (
 // Start with empty object (not null)
 const FormSectionsProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(reducer, {});
-  console.log(state);
 
   return (
     <FormSectionsContext.Provider value={{ state, dispatch }}>

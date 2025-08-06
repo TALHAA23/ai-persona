@@ -39,4 +39,8 @@ export const FORM_NAVIGATION_SEQUENCE: Record<string, FormSearchParams> = {
   FORM3: "personality-and-beliefs",
   FORM4: "culture-and-language-background",
   FORM5: "education-background",
+  FORM6: "files",
 };
+
+export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+export const ALLOWED_TYPES = ["text/plain", "text/markdown"];

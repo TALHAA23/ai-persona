@@ -46,7 +46,7 @@ export const UnifiedMetadataSchema = z.object({
 
   // Context and description
   title: z.string(),
-  description: z.string(),
+  description: z.string().nonempty(),
   context_notes: z.string().optional(),
 
   // Query optimization

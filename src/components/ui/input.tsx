@@ -17,7 +17,6 @@ const inputVariants = cva(
       },
       error: {
         true: "border-red-500 border shadow",
-        false: "",
       },
     },
     defaultVariants: {

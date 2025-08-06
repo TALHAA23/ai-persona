@@ -2,19 +2,13 @@ import { XCircle } from "lucide-react";
 
 export default function ObjectPreview({
   data,
-  setData,
+  updateData,
 }: {
   data: Record<string, any>;
-  setData?: React.Dispatch<React.SetStateAction<any[]>>;
+  updateData?: () => void;
 }) {
   const handleDataUpdate = () => {
-    if (setData)
-      setData((prev) => {
-        const newData = prev.filter(
-          (item) => JSON.stringify(item) !== JSON.stringify(data)
-        );
-        return newData;
-      });
+    if (updateData) updateData();
   };
 
   return (
@@ -29,7 +23,7 @@ export default function ObjectPreview({
       >
         {JSON.stringify(data, null, 2)}
       </div>
-      {setData && (
+      {updateData && (
         <XCircle
           onClick={handleDataUpdate}
           className="fill-red-500 absolute -top-2 -right-2 hover:opacity-85 cursor-pointer size-5"

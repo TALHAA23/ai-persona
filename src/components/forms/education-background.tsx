@@ -284,7 +284,15 @@ export default function EducationBackground({
                   <ObjectPreview
                     key={index}
                     data={history}
-                    setData={setEducationHistory}
+                    // setData={setEducationHistory}
+                    updateData={() =>
+                      setEducationHistory((prev) => {
+                        const newData = prev.filter(
+                          (item, innerIndex) => index !== innerIndex
+                        );
+                        return newData;
+                      })
+                    }
                   />
                 ))}
               </div>

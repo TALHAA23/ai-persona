@@ -22,6 +22,9 @@ const textAreaVariants = cva(
         lg: "h-40",
         xl: "h-60",
       },
+      error: {
+        true: "border-red-500 border shadow",
+      },
     },
     defaultVariants: {
       variant: "default",
@@ -45,11 +48,15 @@ export default function TextArea({
   variant,
   size,
   height,
+  error,
   ...props
 }: TextAreaProps) {
   return (
     <textarea
-      className={cn(textAreaVariants({ variant, size, height }), className)}
+      className={cn(
+        textAreaVariants({ variant, size, height, error }),
+        className
+      )}
       {...props}
     ></textarea>
   );

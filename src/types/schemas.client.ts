@@ -11,6 +11,8 @@ import {
   PrivacyLevelEnum,
   ResponseLengthEnum,
 } from "./enums";
+import { UnifiedMetadataSchema } from "./schemas";
+import { ALLOWED_TYPES, MAX_FILE_SIZE } from "@/utils/shared/CONST";
 
 export const BasicIdentitySchema = z.object({
   firstName: z.string().nonempty(),
@@ -117,6 +119,27 @@ export const EducationBackgroundSchema = z.object({
   favorite_subjects: z.array(z.string()).optional(),
   learning_style: z.string().optional(),
   academic_interests: z.array(z.string()).optional(),
+});
+
+export const FileUploadMetaDataItemSchema = UnifiedMetadataSchema.extend({
+  source_type: z.string().default("file"),
+}).omit({ user_id: true });
+
+export const FileUploadsSchema = z.object({
+  file_uploads: z
+    .array(z.instanceof(File))
+    .nonempty("Please upload at least one file.")
+    .refine(
+      (files) =>
+        files.every(
+          (file) =>
+            ALLOWED_TYPES.includes(file.type) && file.size <= MAX_FILE_SIZE
+        ),
+      {
+        message: "Only .txt or .md files under 5MB are allowed.",
+      }
+    ),
+  file_uploads_metadata: z.array(FileUploadMetaDataItemSchema),
 });
 
 export const FormSectionsSchema = z.object({
