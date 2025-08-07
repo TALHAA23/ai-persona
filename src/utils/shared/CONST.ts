@@ -44,3 +44,4 @@ export const FORM_NAVIGATION_SEQUENCE: Record<string, FormSearchParams> = {
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 export const ALLOWED_TYPES = ["text/plain", "text/markdown"];
+export const ALLOWED_EXTENSIONS = ["txt", "md"];

@@ -1,6 +1,7 @@
 import z from "zod";
 import {
   BasicIdentitySchema,
+  ClientFileUploadsSchema,
   CulturalLanguageBackgroundSchema,
   EducationBackgroundSchema,
   PersonaConfigurationSchema,
@@ -27,6 +28,10 @@ export type FormSectionActions =
   | {
       type: "UPDATE_EDUCATION_BACKGROUND";
       payload: z.infer<typeof EducationBackgroundSchema>;
+    }
+  | {
+      type: "UPDATE_FILES";
+      payload: z.infer<typeof ClientFileUploadsSchema>;
     };
 
 export type FormSearchParams =

@@ -17,7 +17,10 @@ import { CategoriesEnum, ContentTypeEnum, ImportanceEnum } from "@/types/enums";
 import TextArea from "../ui/textarea";
 import { capitalize } from "@/utils/frontend";
 import Checkbox from "../ui/checkbox";
-import { FileUploadMetaDataItemSchema } from "@/types/schemas.client";
+import {
+  FileUploadMetaDataItemSchema,
+  ClientFileUploadsSchema,
+} from "@/types/schemas.client";
 import Button from "../ui/button";
 import useFormNavigator from "@/hooks/use-form-navigator";
 import ObjectPreview from "../ui/object-preview";
@@ -51,18 +54,16 @@ export default function FileUploads({
   next,
 }: PersonaCreationFormProps) {
   const goto = useFormNavigator();
-  const { state } = useFormSections();
+  const { dispatch, state } = useFormSections();
   const scope = useRef<Scope>(null);
   const scopeForForm = useRef<Scope>(null);
   const root = useRef<HTMLDivElement>(null);
   const [selectedFile, setSelectedFile] = useState<File>();
-  const [metadata, setMetadata] = useState<
-    z.infer<typeof FileUploadMetaDataItemSchema>[]
-  >([]);
+  const [fileUploads, setFileUploads] = useState<
+    z.infer<typeof ClientFileUploadsSchema>
+  >({ file_uploads_metadata: [] });
   const [metadataErrors, setMetadataErrors] =
-    useState<
-      z.inferFlattenedErrors<typeof FileUploadMetaDataItemSchema>["fieldErrors"]
-    >();
+    useState<z.inferFlattenedErrors<typeof FileUploadMetaDataItemSchema>>();
 
   const [formState, setFormState] = useState({
     topics: [] as string[],
@@ -73,8 +74,6 @@ export default function FileUploads({
     category: "",
     contentType: "",
     importance: "",
-    isCurrent: true,
-    isHistorical: false,
   });
 
   // Helper function to update form state
@@ -93,8 +92,6 @@ export default function FileUploads({
       category: "",
       contentType: "",
       importance: "",
-      isCurrent: true,
-      isHistorical: false,
     });
   };
 
@@ -116,51 +113,6 @@ export default function FileUploads({
     return () => scopeForForm.current?.revert();
   }, [selectedFile]);
 
-  // const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   setMetadataErrors(undefined);
-  //   const formData = new FormData(e.currentTarget);
-  //   const data = Object.fromEntries(formData.entries());
-
-  //   const additionalData = {
-  //     ...data,
-  //     source_type: "file",
-  //     source_id: selectedFile?.name || "",
-  //     persona_id: state.personaConfigs?.persona_name || "",
-  //     category:formState.category,
-  //     content_type: contentType,
-  //     importance,
-  //     topics,
-  //     keywords,
-  //     tags,
-  //     temporal_context: {
-  //       time_period: data.time_period as string,
-  //       is_current: isCurrent,
-  //       is_historical: isHistorical,
-  //       valid_from: data.valid_from
-  //         ? new Date(data.valid_from as string)
-  //         : undefined,
-  //       valid_until: data.valid_until
-  //         ? new Date(data.valid_until as string)
-  //         : undefined,
-  //     },
-  //     confidence_level: parseFloat(data.confidence_level as string) || 1,
-  //     relevance_scope: relevanceScope.length > 0 ? relevanceScope : undefined,
-  //     audience_tags: audienceTags.length > 0 ? audienceTags : undefined,
-  //   };
-
-  //   try {
-  //     const parsed = FileUploadMetaDataItemSchema.parse(additionalData);
-  //     setMetadata((prev) => [...prev, parsed]);
-  //     setMetadataErrors(undefined);
-  //     setSelectedFile(undefined);
-  //     e.currentTarget.reset();
-  //   } catch (error) {
-  //     if (error instanceof z.ZodError) {
-  //       setMetadataErrors(error.flatten().fieldErrors);
-  //     }
-  //   }
-  // };
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -179,8 +131,8 @@ export default function FileUploads({
       tags: formState.tags,
       temporal_context: {
         time_period: data.time_period as string,
-        is_current: formState.isCurrent,
-        is_historical: formState.isHistorical,
+        is_current: data.is_current,
+        is_historical: data.is_historical,
         valid_from: data.valid_from
           ? new Date(data.valid_from as string)
           : undefined,
@@ -198,19 +150,32 @@ export default function FileUploads({
     };
 
     try {
+      const fileParsed = ClientFileUploadsSchema.shape.file_uploads.parse([
+        selectedFile,
+      ]);
       const parsed = FileUploadMetaDataItemSchema.parse(additionalData);
-      setMetadata((prev) => [...prev, parsed]);
+      // setMetadata((prev) => [...prev, parsed]);
+      if (fileParsed)
+        setFileUploads((prev) => ({
+          file_uploads: [...(prev?.file_uploads || []), ...fileParsed],
+          file_uploads_metadata: [...prev?.file_uploads_metadata, parsed],
+        }));
       setMetadataErrors(undefined);
       setSelectedFile(undefined);
       resetFormState();
       e.currentTarget.reset();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        setMetadataErrors(error.flatten().fieldErrors);
+        setMetadataErrors(error.flatten());
       }
     }
   };
-  console.log(metadataErrors);
+
+  const onNext = () => {
+    dispatch({ type: "UPDATE_FILES", payload: fileUploads });
+    if (next) goto(next);
+  };
+
   return (
     <div
       ref={root}
@@ -232,9 +197,20 @@ export default function FileUploads({
         }
       >
         <div className="w-full">
+          {!!metadataErrors?.formErrors.length && (
+            <Heading as={"p"} asError={true}>
+              {metadataErrors.formErrors[0]}
+            </Heading>
+          )}
+          {/* {metadataErrors?.formErrors &&
+            metadataErrors.formErrors.length > 0 && (
+              <Heading as={"p"} asError={true}>
+                {metadataErrors.formErrors[0]}
+              </Heading>
+            )} */}
           <DragDrop
             variant="glass"
-            accept="image/*"
+            accept=".md, .txt, text/markdown, text/plain"
             maxSize={5 * 1024 * 1024} // 5MB
             selectedFile={selectedFile}
             onFileSelected={(file) => setSelectedFile(file)}
@@ -243,6 +219,7 @@ export default function FileUploads({
           {selectedFile && (
             <form onSubmit={handleSubmit} className="w-full space-y-4 my-1">
               {/* Basic Information */}
+
               <div>
                 <Label htmlFor="title" fieldInfo={FILE_FIELD_INFO.title}>
                   Title
@@ -251,7 +228,7 @@ export default function FileUploads({
                   id="title"
                   name="title"
                   variant={"glass"}
-                  error={!!metadataErrors?.title}
+                  error={!!metadataErrors?.fieldErrors.title}
                   defaultValue={selectedFile.name}
                 />
               </div>
@@ -262,7 +239,7 @@ export default function FileUploads({
                   id="description"
                   name="description"
                   variant={"glass"}
-                  error={!!metadataErrors?.description}
+                  error={!!metadataErrors?.fieldErrors.description}
                 />
               </div>
 
@@ -276,7 +253,7 @@ export default function FileUploads({
                   <SelectTrigger
                     placeholder="Select Category"
                     variants={"glass"}
-                    error={!!metadataErrors?.category}
+                    error={!!metadataErrors?.fieldErrors.category}
                   />
                   <SelectContent>
                     {CategoriesEnum.options.map((item) => (
@@ -298,7 +275,7 @@ export default function FileUploads({
                   <SelectTrigger
                     placeholder="Select Content Type"
                     variants={"glass"}
-                    error={!!metadataErrors?.content_type}
+                    error={!!metadataErrors?.fieldErrors.content_type}
                   />
                   <SelectContent>
                     {ContentTypeEnum.options.map((item) => (
@@ -359,7 +336,7 @@ export default function FileUploads({
                   <SelectTrigger
                     placeholder="Select Importance"
                     variants={"glass"}
-                    error={!!metadataErrors?.importance}
+                    error={!!metadataErrors?.fieldErrors.importance}
                   />
                   <SelectContent>
                     {ImportanceEnum.options.map((item) => (
@@ -388,7 +365,7 @@ export default function FileUploads({
                   step="0.1"
                   defaultValue="1"
                   variant={"glass"}
-                  error={!!metadataErrors?.confidence_level}
+                  error={!!metadataErrors?.fieldErrors.confidence_level}
                 />
               </div>
 
@@ -404,7 +381,7 @@ export default function FileUploads({
                   id="time_period"
                   name="time_period"
                   variant={"glass"}
-                  error={!!metadataErrors?.temporal_context}
+                  error={!!metadataErrors?.fieldErrors.temporal_context}
                 />
               </div>
 
@@ -413,19 +390,12 @@ export default function FileUploads({
                   label="Is Current"
                   id="is_current"
                   name="is_current"
-                  checked={formState.isCurrent}
-                  onChange={(e) =>
-                    updateFormState("isCurrent", e.currentTarget.value)
-                  }
+                  defaultChecked={true}
                 />
                 <Checkbox
                   label="Is Historical"
                   id="is_historical"
                   name="is_historical"
-                  checked={formState.isHistorical}
-                  onChange={(e) =>
-                    updateFormState("isHistorical", e.currentTarget.value)
-                  }
                 />
               </div>
 
@@ -478,9 +448,30 @@ export default function FileUploads({
               </Button>
             </form>
           )}
-          {metadata.length > 0 && (
+          {fileUploads?.file_uploads_metadata?.length > 0 && (
             <div className="thin-scrollbar overflow-x-auto flex gap-2 px-3.5">
-              {metadata.map((item, index) => (
+              {fileUploads?.file_uploads_metadata.map((item, index) => (
+                <ObjectPreview
+                  key={index}
+                  data={{ title: item.title, desc: item.description }}
+                  updateData={() =>
+                    setFileUploads((prev) => {
+                      const newUploads =
+                        prev?.file_uploads?.filter((_, i) => i !== index) ?? [];
+                      const newMetadata =
+                        prev?.file_uploads_metadata?.filter(
+                          (_, i) => i !== index
+                        ) ?? [];
+
+                      return {
+                        file_uploads: newUploads,
+                        file_uploads_metadata: newMetadata,
+                      };
+                    })
+                  }
+                />
+              ))}
+              {/* {metadata.map((item, index) => (
                 <ObjectPreview
                   key={index}
                   data={{ title: item.title, desc: item.description }}
@@ -493,7 +484,7 @@ export default function FileUploads({
                     })
                   }
                 />
-              ))}
+              ))} */}
             </div>
           )}
         </div>
@@ -516,7 +507,7 @@ export default function FileUploads({
                 Previous
               </Button>
             )}
-            <Button type="submit" icon={"arrowRight"}>
+            <Button onClick={onNext} icon={"arrowRight"}>
               Next
             </Button>
           </div>

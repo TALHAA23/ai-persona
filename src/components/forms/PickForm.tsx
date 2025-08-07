@@ -24,7 +24,7 @@ export default function PickedForm({
     case "education-background":
       return <EducationBackground prev={FORM4} next={FORM6} skippable={true} />;
     case "files":
-      return <FileUploads prev={FORM5} skippable={true} />;
+      return <FileUploads prev={FORM5} next="basic" skippable={true} />;
     default:
       return <h1>Failed to Pick a form</h1>;
   }

@@ -11,6 +11,8 @@ export default function Checkbox({
   htmlFor,
   ...props
 }: CheckboxProps) {
+  
+  console.log(props.checked)
   return (
     <div>
       <input

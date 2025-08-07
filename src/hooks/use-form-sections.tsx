@@ -32,7 +32,8 @@ const reducer = (
       return { ...state, personalityAndBeliefs: action.payload };
     case "UPDATE_EDUCATION_BACKGROUND":
       return { ...state, educationBackground: action.payload };
-
+    case "UPDATE_FILES":
+      return { ...state, files: action.payload };
     default:
       return state;
   }

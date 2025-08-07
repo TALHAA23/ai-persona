@@ -12,7 +12,11 @@ import {
   ResponseLengthEnum,
 } from "./enums";
 import { UnifiedMetadataSchema } from "./schemas";
-import { ALLOWED_TYPES, MAX_FILE_SIZE } from "@/utils/shared/CONST";
+import {
+  ALLOWED_EXTENSIONS,
+  ALLOWED_TYPES,
+  MAX_FILE_SIZE,
+} from "@/utils/shared/CONST";
 
 export const BasicIdentitySchema = z.object({
   firstName: z.string().nonempty(),
@@ -123,22 +127,38 @@ export const EducationBackgroundSchema = z.object({
 
 export const FileUploadMetaDataItemSchema = UnifiedMetadataSchema.extend({
   source_type: z.string().default("file"),
+  temporal_context: UnifiedMetadataSchema.shape.temporal_context.extend({
+    is_current: z
+      .string()
+      .optional()
+      .transform((val) => (typeof val === "string" ? val === "on" : !!val)),
+    is_historical: z
+      .string()
+      .optional()
+      .transform((val) => (typeof val === "string" ? val == "on" : !!val)),
+  }),
 }).omit({ user_id: true });
 
-export const FileUploadsSchema = z.object({
+export const ClientFileUploadsSchema = z.object({
   file_uploads: z
     .array(z.instanceof(File))
-    .nonempty("Please upload at least one file.")
+    .default([])
     .refine(
       (files) =>
-        files.every(
-          (file) =>
-            ALLOWED_TYPES.includes(file.type) && file.size <= MAX_FILE_SIZE
-        ),
+        files.every((file) => {
+          const typeValid =
+            ALLOWED_TYPES.includes(file.type) ||
+            ALLOWED_EXTENSIONS.includes(file.name.split(".").pop() || "");
+
+          const sizeValid = file.size <= MAX_FILE_SIZE;
+          return typeValid && sizeValid;
+        }),
       {
         message: "Only .txt or .md files under 5MB are allowed.",
       }
-    ),
+    )
+    .optional(),
+
   file_uploads_metadata: z.array(FileUploadMetaDataItemSchema),
 });
 
@@ -148,4 +168,5 @@ export const FormSectionsSchema = z.object({
   cultureAndLanguageBackground: CulturalLanguageBackgroundSchema,
   personalityAndBeliefs: PersonalityAndBeliefsSchema,
   educationBackground: EducationBackgroundSchema.optional(),
+  files: ClientFileUploadsSchema.optional(),
 });
