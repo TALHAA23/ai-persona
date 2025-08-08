@@ -33,6 +33,10 @@ export const ANIMEJS_ANIMATION_CLASSES = {
   },
 };
 
+export const API_ENDPOINTS = {
+  CREATE_PERSONA: "/api/persona/upload",
+};
+
 export const FORM_NAVIGATION_SEQUENCE: Record<string, FormSearchParams> = {
   FORM1: "persona-config",
   FORM2: "basic",
@@ -40,6 +44,7 @@ export const FORM_NAVIGATION_SEQUENCE: Record<string, FormSearchParams> = {
   FORM4: "culture-and-language-background",
   FORM5: "education-background",
   FORM6: "files",
+  LAST: "submission",
 };
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB

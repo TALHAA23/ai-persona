@@ -83,9 +83,9 @@ export const ChunkSchema = z.object({
 
 // Form Section Schema
 export const FormSectionSchema = z.object({
-  section_id: z.string(),
   section_name: z.string(),
-  is_completed: z.boolean(),
+  // ? not require for v1
+  // is_completed: z.boolean(),
   data: z.record(z.any()),
   metadata: UnifiedMetadataSchema.omit({
     source_type: true, // We'll add this programmatically

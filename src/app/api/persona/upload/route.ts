@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
         parsed
       ),
     }));
+    return NextResponse.json("true");
 
     // data from forms
     const docsFromFormSections = await createFormDataChunks(

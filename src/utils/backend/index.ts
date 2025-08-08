@@ -21,7 +21,9 @@ export function parseLLMJsonResponse(rawResponse: string): any {
 }
 
 export function resolvePersonaCreationData(data: FormData) {
-  const metadata = JSON.parse(data.get("file_uploads_metadata") as string);
+  const metadataRaw = data.get("file_uploads_metadata");
+  const metadata =
+    metadataRaw && !(metadataRaw instanceof File) && JSON.parse(metadataRaw);
   const file_uploads = data
     .getAll("file_uploads")
     .filter((f): f is File => f instanceof File)
@@ -32,10 +34,12 @@ export function resolvePersonaCreationData(data: FormData) {
         metadata[index]
       ),
     }));
+  const form_sections = data
+    .getAll("form_sections")
+    .map((section) => JSON.parse(section.toString()));
 
   // ! mock identifaction
   data.set("user_id", "2af2125c-a2ed-4ebc-80f1-ef8c509b6a16");
-  data.set("persona_name", "example-persona");
 
   const base: Record<string, any> = Object.fromEntries(data.entries());
   Array.from(Object.entries(base)).map(([key, value]) => {
@@ -48,7 +52,9 @@ export function resolvePersonaCreationData(data: FormData) {
     }
   });
 
-  return file_uploads.length ? { ...base, file_uploads } : { ...base };
+  return file_uploads.length
+    ? { ...base, file_uploads, form_sections }
+    : { ...base, form_sections };
 }
 
 export function formatErrorMessage(tag: ErrorTag, error: unknown) {

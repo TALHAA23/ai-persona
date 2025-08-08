@@ -6,12 +6,14 @@ import PersonalityAndBeliefs from "./personality-and-beliefs";
 import EducationBackground from "./education-background";
 import { FORM_NAVIGATION_SEQUENCE } from "@/utils/shared/CONST";
 import FileUploads from "./files-uploads";
+import Submission from "./submission";
 export default function PickedForm({
   currentForm,
 }: {
   currentForm: FormSearchParams;
 }) {
-  const { FORM1, FORM2, FORM3, FORM4, FORM5, FORM6 } = FORM_NAVIGATION_SEQUENCE;
+  const { FORM1, FORM2, FORM3, FORM4, FORM5, FORM6, LAST } =
+    FORM_NAVIGATION_SEQUENCE;
   switch (currentForm) {
     case "persona-config":
       return <PersonaConfig next={FORM2} />;
@@ -24,7 +26,9 @@ export default function PickedForm({
     case "education-background":
       return <EducationBackground prev={FORM4} next={FORM6} skippable={true} />;
     case "files":
-      return <FileUploads prev={FORM5} next="basic" skippable={true} />;
+      return <FileUploads prev={FORM5} next={LAST} skippable={true} />;
+    case "submission":
+      return <Submission prev={FORM6} />;
     default:
       return <h1>Failed to Pick a form</h1>;
   }

@@ -202,12 +202,6 @@ export default function FileUploads({
               {metadataErrors.formErrors[0]}
             </Heading>
           )}
-          {/* {metadataErrors?.formErrors &&
-            metadataErrors.formErrors.length > 0 && (
-              <Heading as={"p"} asError={true}>
-                {metadataErrors.formErrors[0]}
-              </Heading>
-            )} */}
           <DragDrop
             variant="glass"
             accept=".md, .txt, text/markdown, text/plain"
@@ -471,20 +465,6 @@ export default function FileUploads({
                   }
                 />
               ))}
-              {/* {metadata.map((item, index) => (
-                <ObjectPreview
-                  key={index}
-                  data={{ title: item.title, desc: item.description }}
-                  updateData={() =>
-                    setMetadata((prev) => {
-                      const newData = prev.filter(
-                        (innerItem) => innerItem.title !== item.title
-                      );
-                      return newData;
-                    })
-                  }
-                />
-              ))} */}
             </div>
           )}
         </div>
