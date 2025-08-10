@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import embedAndInsert from "@/lib/backend/embedd-and-insert";
 import z from "zod";
 import createFormDataChunks from "@/lib/backend/create-form-data-chunks";
-import {
-  createMetadataFromForm,
-  resolvePersonaCreationData,
-} from "@/utils/backend";
+import { resolvePersonaCreationData } from "@/utils/backend";
 import { PersonaCreationInputSchema } from "@/types/schemas";
 import uploadFiles from "@/lib/backend/uploadFiles";
 import readFiles from "@/lib/backend/readFiles";
@@ -16,17 +13,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const resolvedData = resolvePersonaCreationData(formData);
     const parsed = PersonaCreationInputSchema.parse(resolvedData);
-
-    // update metadata for each form section
-    parsed.form_sections = parsed.form_sections.map((section) => ({
-      ...section,
-      metadata: createMetadataFromForm(
-        section.section_id,
-        section.section_name,
-        parsed
-      ),
-    }));
-    return NextResponse.json("true");
+    // return NextResponse.json("true");
 
     // data from forms
     const docsFromFormSections = await createFormDataChunks(

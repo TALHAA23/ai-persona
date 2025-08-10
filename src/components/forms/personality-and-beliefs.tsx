@@ -46,6 +46,7 @@ const PERSONALITY_FIELD_INFO = {
     "Words that describe your personality. These shape the chatbot's tone and behavior.",
 };
 
+type FormattedError = z.inferFormattedError<typeof PersonalityAndBeliefsSchema>;
 export default function PersonalityAndBeliefs({
   next,
   prev,
@@ -53,13 +54,10 @@ export default function PersonalityAndBeliefs({
 }: PersonaCreationFormProps) {
   const goto = useFormNavigator();
   const { dispatch, state } = useFormSections();
-  const prevData = useRef(state.personalityAndBeliefs).current;
+  const prevData = useRef(state.personalityAndBeliefs).current?.data;
   const scope = useRef<Scope>(null);
   const root = useRef<HTMLFormElement>(null);
-  const [errors, setErrors] =
-    useState<
-      z.inferFlattenedErrors<typeof PersonalityAndBeliefsSchema>["fieldErrors"]
-    >();
+  const [errors, setErrors] = useState<FormattedError["data"]>();
   const [defaultTone, setDefaultTone] = useState(prevData?.default_tone || "");
   const [emotionalExpressionLevel, setEmotionalExpressionLevel] = useState(
     prevData?.emotional_expression_level || ""
@@ -96,13 +94,15 @@ export default function PersonalityAndBeliefs({
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
     const additionalData = {
-      ...data,
-      default_tone: defaultTone,
-      introvert_or_extrovert: personalityType,
-      core_values: coreValues,
-      sensitive_topics_to_avoid: sensitiveTopicsToAvoid,
-      personality_traits: personalityTraits,
-      emotional_expression_level: emotionalExpressionLevel,
+      data: {
+        ...data,
+        default_tone: defaultTone,
+        introvert_or_extrovert: personalityType,
+        core_values: coreValues,
+        sensitive_topics_to_avoid: sensitiveTopicsToAvoid,
+        personality_traits: personalityTraits,
+        emotional_expression_level: emotionalExpressionLevel,
+      },
     };
     try {
       const parsed = PersonalityAndBeliefsSchema.parse(additionalData);
@@ -113,7 +113,7 @@ export default function PersonalityAndBeliefs({
       if (next) goto(next);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        setErrors(error.flatten().fieldErrors);
+        setErrors((error.format() as FormattedError).data);
       }
     }
   };

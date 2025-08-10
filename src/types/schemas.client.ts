@@ -10,6 +10,7 @@ import {
   PersonaTypeEnum,
   PrivacyLevelEnum,
   ResponseLengthEnum,
+  SectionNames,
 } from "./enums";
 import { UnifiedMetadataSchema } from "./schemas";
 import {
@@ -19,16 +20,19 @@ import {
 } from "@/utils/shared/CONST";
 
 export const BasicIdentitySchema = z.object({
-  firstName: z.string().nonempty(),
-  lastName: z.string().nonempty(),
-  age: z.coerce.number().int().min(1).max(120),
-  gender: GenderEnums,
-  nationality: z.string(),
+  section_name: SectionNames.optional().default("basic-identity"),
+  data: z.object({
+    firstName: z.string().nonempty(),
+    lastName: z.string().nonempty(),
+    age: z.coerce.number().int().min(1).max(120),
+    gender: GenderEnums,
+    nationality: z.string(),
 
-  ethnicity: z.string().optional(),
-  preferred_pronouns: z.string().optional(),
-  date_of_birth: z.string().optional(), // ISO format
-  current_location: z.string().optional(),
+    ethnicity: z.string().optional(),
+    preferred_pronouns: z.string().optional(),
+    date_of_birth: z.string().optional(), // ISO format
+    current_location: z.string().optional(),
+  }),
 });
 
 const coerceEmptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
@@ -52,33 +56,41 @@ export const PersonaConfigurationSchema = z.object({
 });
 
 export const CulturalLanguageBackgroundSchema = z.object({
-  native_language: z.string().nonempty(),
-  other_languages: z.array(z.string()).default([]),
-  religion: z.string().default("none"),
-  cultural_identity: z.string(),
+  section_name: SectionNames.optional().default(
+    "culture-and-language-background"
+  ),
+  data: z.object({
+    native_language: z.string().nonempty(),
+    other_languages: z.array(z.string()).default([]),
+    religion: z.string().default("none"),
+    cultural_identity: z.string(),
 
-  language_proficiency: z.record(LanguageProficiencyEnum).optional(),
+    language_proficiency: z.record(LanguageProficiencyEnum).optional(),
 
-  accents_or_dialects: z.array(z.string()).optional(),
-  festivals_celebrated: z.array(z.string()).optional(),
-  customs_or_norms: z.array(z.string()).optional(),
-  cultural_references: z.array(z.string()).optional(),
+    accents_or_dialects: z.array(z.string()).optional(),
+    festivals_celebrated: z.array(z.string()).optional(),
+    customs_or_norms: z.array(z.string()).optional(),
+    cultural_references: z.array(z.string()).optional(),
+  }),
 });
 
 export const PersonalityAndBeliefsSchema = z.object({
-  communication_style: z.string(), // or z.enum([...])
-  core_values: z.array(z.string()).min(1),
-  default_tone: PersonaToneEnum,
-  introvert_or_extrovert: PersonalityTypeEnum,
+  section_name: SectionNames.optional().default("personality-and-beliefs"),
+  data: z.object({
+    communication_style: z.string(), // or z.enum([...])
+    core_values: z.array(z.string()).min(1),
+    default_tone: PersonaToneEnum,
+    introvert_or_extrovert: PersonalityTypeEnum,
 
-  humor_style: z.string().optional(),
-  belief_system: z.string().optional(),
-  political_view: z.string().optional(),
-  emotional_expression_level: coerceEmptyToUndefined(
-    EmotionalExpressionLevelEnum.optional()
-  ),
-  sensitive_topics_to_avoid: z.array(z.string()).optional(),
-  personality_traits: z.array(z.string()).optional(),
+    humor_style: z.string().optional(),
+    belief_system: z.string().optional(),
+    political_view: z.string().optional(),
+    emotional_expression_level: coerceEmptyToUndefined(
+      EmotionalExpressionLevelEnum.optional()
+    ),
+    sensitive_topics_to_avoid: z.array(z.string()).optional(),
+    personality_traits: z.array(z.string()).optional(),
+  }),
 });
 
 export const AIChatbotPreferencesSchema = z.object({
@@ -162,7 +174,7 @@ export const ClientFileUploadsSchema = z.object({
   file_uploads_metadata: z.array(FileUploadMetaDataItemSchema),
 });
 
-export const FormSectionsSchema = z.object({
+export const FormsDataSchema = z.object({
   basicIdentity: BasicIdentitySchema,
   personaConfigs: PersonaConfigurationSchema,
   cultureAndLanguageBackground: CulturalLanguageBackgroundSchema,

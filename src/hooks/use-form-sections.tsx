@@ -1,11 +1,11 @@
 "use client";
-import { FormSectionsSchema } from "@/types/schemas.client";
+import { FormsDataSchema } from "@/types/schemas.client";
 import { FormSectionActions } from "@/types/types.client";
 import { API_ENDPOINTS } from "@/utils/shared/CONST";
 import React, { createContext, useContext, ReactNode, useReducer } from "react";
 import z from "zod";
 
-type FormSectionsContextType = z.infer<typeof FormSectionsSchema>;
+type FormSectionsContextType = z.infer<typeof FormsDataSchema>;
 
 // Allow partial updates
 type PartialFormSectionsState = Partial<FormSectionsContextType>;
@@ -61,13 +61,14 @@ const FormSectionsProvider = ({ children }: { children: ReactNode }) => {
     // persona configs form
     const { global_settings, persona_description, persona_name } =
       state?.personaConfigs || {};
-    formdata.set("globals_settings", JSON.stringify(global_settings));
+    formdata.set("global_settings", JSON.stringify(global_settings));
     formdata.set("persona_description", persona_description || "");
     formdata.set("persona_name", persona_name || "");
 
     delete state.files;
     delete state.personaConfigs;
 
+    // form sections
     Object.values(state).forEach((item) => {
       formdata.append("form_sections", JSON.stringify(item));
     });

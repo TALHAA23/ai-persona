@@ -72,5 +72,11 @@ export const EmotionalExpressionLevelEnum = z.enum([
 export const FormalityLevelEnum = z.enum(["formal", "semi-formal", "casual"]);
 export const ResponseLengthEnum = z.enum(["short", "medium", "detailed"]);
 export const EmojiUseFrequencey = z.enum(["never", "sometimes", "frequently"]);
+export const SectionNames = z.enum([
+  "basic-identity",
+  "culture-and-language-background",
+  "personality-and-beliefs",
+  "education-background",
+]);
 
 export const GenderEnums = z.enum(["male", "female", "prefer_not_to_say"]);

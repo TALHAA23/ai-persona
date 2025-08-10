@@ -22,8 +22,15 @@ export function parseLLMJsonResponse(rawResponse: string): any {
 
 export function resolvePersonaCreationData(data: FormData) {
   const metadataRaw = data.get("file_uploads_metadata");
+
   const metadata =
-    metadataRaw && !(metadataRaw instanceof File) && JSON.parse(metadataRaw);
+    !(metadataRaw instanceof File) &&
+    !metadataRaw &&
+    typeof metadataRaw === "string" &&
+    metadataRaw.trim() !== ""
+      ? JSON.parse(metadataRaw)
+      : undefined;
+
   const file_uploads = data
     .getAll("file_uploads")
     .filter((f): f is File => f instanceof File)
@@ -34,9 +41,15 @@ export function resolvePersonaCreationData(data: FormData) {
         metadata[index]
       ),
     }));
+
+  // form sections
   const form_sections = data
     .getAll("form_sections")
-    .map((section) => JSON.parse(section.toString()));
+    .map((section) => JSON.parse(section.toString()))
+    .map((section) => ({
+      ...section,
+      metadata: createMetadataFromForm(section.section_name, section.data),
+    }));
 
   // ! mock identifaction
   data.set("user_id", "2af2125c-a2ed-4ebc-80f1-ef8c509b6a16");
@@ -70,7 +83,7 @@ export function formatErrorMessage(tag: ErrorTag, error: unknown) {
 
 // Helper to create metadata from form section
 export function createMetadataFromForm(
-  sectionId: string,
+  // sectionId: string,
   sectionName: string,
   formData: Record<string, any>,
   userMetadata: Partial<UnifiedMetadata> = {}
@@ -88,14 +101,14 @@ export function createMetadataFromForm(
     user_id: user_id as string,
     persona_id: persona_id as string,
     source_type: "form",
-    source_id: sectionId,
+    source_id: sectionName,
     category: userMetadata.category || "other",
     title: userMetadata.title || sectionName,
     description: userMetadata.description || `Form data from ${sectionName}`,
     content_type: userMetadata.content_type || "factual",
-    topics: userMetadata.topics || [sectionId],
+    topics: userMetadata.topics || [sectionName],
     keywords: userMetadata.keywords || Object.keys(formData),
-    tags: userMetadata.tags || [sectionId],
+    tags: userMetadata.tags || [sectionName],
     temporal_context: {
       is_current: true,
       is_historical: false,

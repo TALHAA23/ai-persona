@@ -22,6 +22,7 @@ const GENDER_OPTIONS = {
   PREFER_NOT_TO_SAY: "prefer_not_to_say",
 };
 
+type FormattedError = z.inferFormattedError<typeof BasicIdentitySchema>;
 export default function BasicInfo({
   prev,
   next,
@@ -29,14 +30,11 @@ export default function BasicInfo({
 }: PersonaCreationFormProps) {
   const goto = useFormNavigator();
   const { dispatch, state } = useFormSections();
-  const prevData = useRef(state.basicIdentity).current;
+  const prevData = useRef(state.basicIdentity).current?.data;
   const scope = useRef<Scope>(null);
   const root = useRef<HTMLFormElement>(null);
   const [gender, setGender] = useState(prevData?.gender || "");
-  const [error, setError] =
-    useState<
-      z.inferFlattenedErrors<typeof BasicIdentitySchema>["fieldErrors"]
-    >();
+  const [error, setError] = useState<FormattedError["data"]>();
 
   useEffect(() => {
     if (!root.current) return;
@@ -52,7 +50,7 @@ export default function BasicInfo({
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
-    const additionalData = { ...data, gender };
+    const additionalData = { data: { ...data, gender } };
     try {
       const parsed = BasicIdentitySchema.parse(additionalData);
       dispatch({ type: "UPDATE_BASIC_IDENTITY", payload: parsed });
@@ -60,7 +58,7 @@ export default function BasicInfo({
       if (next) goto(next);
     } catch (err) {
       if (err instanceof z.ZodError) {
-        setError(err.flatten().fieldErrors);
+        setError((err.format() as FormattedError)?.data);
       }
     }
   }
@@ -143,7 +141,6 @@ export default function BasicInfo({
               defaultValue={prevData?.nationality}
               id="nationality"
               name="nationality"
-              required
               variant={"glass"}
             />
           </div>

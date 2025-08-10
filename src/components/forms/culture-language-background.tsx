@@ -33,6 +33,9 @@ const CULTURAL_FIELD_INFO = {
     "Common media, art, or cultural elements you relate to or grew up with. Useful for casual conversation or metaphors. Examples: Bollywood films, Pakistani dramas, Quranic stories, Sufi poetry.",
 };
 
+type FormattedError = z.inferFormattedError<
+  typeof CulturalLanguageBackgroundSchema
+>;
 export default function CultureAndLanguageBackground({
   next,
   prev,
@@ -40,15 +43,10 @@ export default function CultureAndLanguageBackground({
 }: PersonaCreationFormProps) {
   const goto = useFormNavigator();
   const { dispatch, state } = useFormSections();
-  const prevData = useRef(state.cultureAndLanguageBackground).current;
+  const prevData = useRef(state.cultureAndLanguageBackground).current?.data;
   const scope = useRef<Scope>(null);
   const root = useRef<HTMLFormElement>(null);
-  const [errors, setErrors] =
-    useState<
-      z.inferFlattenedErrors<
-        typeof CulturalLanguageBackgroundSchema
-      >["fieldErrors"]
-    >();
+  const [errors, setErrors] = useState<FormattedError["data"]>();
   const [otherLanguages, setOtherLanguages] = useState([
     ...(prevData?.other_languages || []),
   ]);
@@ -86,12 +84,14 @@ export default function CultureAndLanguageBackground({
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
     const additionalData = {
-      ...data,
-      other_languages: otherLanguages,
-      accents_or_dialects: accentsOrDialects,
-      festivals_celebrated: festivalsCelebrated,
-      customs_or_norms: customsOrNorms,
-      cultural_references: culturalReferences,
+      data: {
+        ...data,
+        other_languages: otherLanguages,
+        accents_or_dialects: accentsOrDialects,
+        festivals_celebrated: festivalsCelebrated,
+        customs_or_norms: customsOrNorms,
+        cultural_references: culturalReferences,
+      },
     };
     try {
       const parsed = CulturalLanguageBackgroundSchema.parse(additionalData);
@@ -102,7 +102,7 @@ export default function CultureAndLanguageBackground({
       if (next) goto(next);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        setErrors(error.flatten().fieldErrors);
+        setErrors((error.format() as FormattedError).data);
       }
     }
   };
